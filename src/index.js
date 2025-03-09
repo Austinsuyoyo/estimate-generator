@@ -2,6 +2,7 @@
 import formHtml from './form.html';
 import quoteTemplate from './quote.html';
 
+const DEFAULT_LOGO_URL = "https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc";
 
 const hotComputerRoasts = [
 	"你這台電腦是打算兼職烤箱嗎？看樣子手撐一下就能烤麵包了！",
@@ -52,41 +53,91 @@ export default {
 
 
 			const formData = await request.formData();
-			const logoUrl = formData.get("logoUrl") || "";
+			const logoUrl = formData.get("logoUrl") || DEFAULT_LOGO_URL;
 			const providerName = formData.get("providerName") || "";
 			const providerContact = formData.get("providerContact") || "";
+			const providerPhone = formData.get("providerPhone") || "";
 			const customerName = formData.get("customerName") || "";
-			const customerContact = formData.get("customerContact") || "";
+			const customerAddress = formData.get("customerAddress") || "";
+			const customerPhone = formData.get("customerPhone") || "";
 			const quoteNumber = formData.get("quoteNumber") || "";
 			const date = formData.get("date") || "";
 			const deadline = formData.get("deadline") || "";
 			const taxPercent = parseFloat(formData.get("taxPercent") || "0");
 			const remarks = formData.get("remarks") || "";
+			
+			const contactPerson = formData.get("contactPerson") || "";
+			const contactPhone = formData.get("contactPhone") || "";
+			const contactGender = formData.get("contactGender") || "先生";
+			const fax = formData.get("fax") || "";
+			const taxId = formData.get("taxId") || "";
+			const deliveryDate = formData.get("deliveryDate") || "";
+			const deliveryDay = formData.get("deliveryDay") || "";
+			const deliveryTime = formData.get("deliveryTime") || "";
+			const deliveryAddress = formData.get("deliveryAddress") || "";
+			const storeName = formData.get("storeName") || "";
+			const staffName = formData.get("staffName") || "";
 
 			// 取得所有品項資料（可能有多筆品項）
 			const itemDescriptions = formData.getAll("itemDescription");
 			const itemQuantities = formData.getAll("itemQuantity");
 			const itemUnitPrices = formData.getAll("itemUnitPrice");
+			const itemNames = formData.getAll("itemName") || Array(Math.max(itemDescriptions.length, itemQuantities.length)).fill("");
+
+			// 收集所有 itemType_ 開頭的欄位
+			const itemTypes = [];
+			for (const [key, value] of formData.entries()) {
+				if (key.startsWith('itemType_')) {
+					itemTypes.push(value);
+				}
+			}
+
+			// 確保 itemTypes 長度與 itemQuantities 一致
+			while (itemTypes.length < itemQuantities.length) {
+				itemTypes.push("現烤烤餅");
+			}
 
 			let itemsHtml = "";
 			let subtotal = 0;
-			for (let i = 0; i < itemDescriptions.length; i++) {
-				const desc = itemDescriptions[i];
+			for (let i = 0; i < itemQuantities.length; i++) {
+				const desc = i < itemDescriptions.length ? itemDescriptions[i] : "";
+				const name = i < itemNames.length ? itemNames[i] : "";
+				const type = i < itemTypes.length ? itemTypes[i] : "現烤烤餅";
 				const qty = Math.floor(parseFloat(itemQuantities[i]) || 0);
 				const price = Math.floor(parseFloat(itemUnitPrices[i]) || 0);
 				const lineTotal = qty * price;
 				subtotal += lineTotal;
+				
+				// 交換品名和項目的顯示
+				let displayName = type; // 品名顯示為烤餅類型
+				let displayDesc = name; // 項目顯示為口味
+				if (desc && desc.trim() !== "") {
+					displayDesc += " - " + desc;
+				}
+				
 				itemsHtml += `<tr>
-            <td>${desc}</td>
-            <td>${formatNumber(price)}</td>
-            <td>${formatNumber(qty)}</td>
-            <td>${formatNumber(lineTotal)}</td>
-          </tr>`;
+					<td>${i + 1}</td>
+					<td>${displayName}</td>
+					<td>${displayDesc}</td>
+					<td>${formatNumber(qty)}</td>
+					<td>${formatNumber(price)}</td>
+					<td>${formatNumber(lineTotal)}</td>
+				</tr>`;
 			}
 
-			// 採用 Math.floor 捨去小數
+			// 計算稅金和總計
 			const taxAmount = Math.floor(subtotal * (taxPercent / 100));
 			const total = subtotal + taxAmount;
+
+			// 準備備註內容
+			const processedRemarks = remarks
+				.replace(/{{deliveryDate}}/g, deliveryDate)
+				.replace(/{{deliveryDay}}/g, deliveryDay)
+				.replace(/{{deliveryTime}}/g, deliveryTime)
+				.replace(/{{deliveryAddress}}/g, deliveryAddress)
+				.replace(/{{storeName}}/g, storeName);
+
+			const taxDisplay = taxPercent === 0 ? "內含" : formatNumber(taxAmount);
 
 			// 在後端轉換 logoUrl 為 Base64
 			let logoBase64 = "";
@@ -97,6 +148,15 @@ export default {
 					console.error("Error converting logo to Base64:", error);
 					// 如果無法轉換就保持原樣
 					logoBase64 = logoUrl;
+					// 如果無法轉換就保持原樣
+					logoBase64 = logoUrl;
+					if (logoUrl !== DEFAULT_LOGO_URL) {
+						try {
+							logoBase64 = await convertImageToBase64(DEFAULT_LOGO_URL);
+						} catch (fallbackError) {
+							console.error("Error converting default logo to Base64:", fallbackError);
+						}
+					}
 				}
 			}
 
@@ -105,9 +165,11 @@ export default {
 				logoUrl,
 				logoBase64,
 				providerName,
-				providerContact: providerContact.replace(/\n/g, "<br>"),
+				providerContact,
+				providerPhone,
 				customerName,
-				customerContact: customerContact.replace(/\n/g, "<br>"),
+				customerAddress,
+				customerPhone,
 				quoteNumber,
 				date,
 				deadline,
@@ -115,8 +177,20 @@ export default {
 				subtotalFormatted: formatNumber(subtotal),
 				taxPercent: taxPercent,
 				taxAmountFormatted: formatNumber(taxAmount),
+				taxDisplay: taxDisplay,
 				totalFormatted: formatNumber(total),
-				remarks: remarks.replace(/\n/g, "<br>")
+				remarks: processedRemarks.replace(/\n/g, "<br>"),
+				contactPerson,
+				contactGender,
+				contactPhone,
+				fax,
+				taxId,
+				deliveryDate,
+				deliveryDay,
+				deliveryTime,
+				deliveryAddress,
+				storeName,
+				staffName
 			};
 
 			// 使用模板字串替換，產生最終 HTML

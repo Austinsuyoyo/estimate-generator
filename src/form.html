@@ -3,6 +3,7 @@
 
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>報價單產生器</title>
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -14,10 +15,57 @@
         width: 60px;
         height: 60px;
         font-size: 24px;
+        z-index: 1000;
       }
       .delete-cell {
         width: 50px;
         text-align: center;
+      }
+      .card-header {
+        font-weight: bold;
+      }
+      .form-label {
+        font-weight: 500;
+      }
+      .table th {
+        background-color: #f8f9fa;
+      }
+      .btn-add-item {
+        background-color: #28a745;
+        border-color: #28a745;
+      }
+      .btn-add-item:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+      }
+      /* 響應式設計優化 */
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+        #submitButton {
+          bottom: 10px;
+          right: 10px;
+          width: 50px;
+          height: 50px;
+          font-size: 20px;
+        }
+        .card {
+          margin-bottom: 15px;
+        }
+      }
+      /* 表格響應式優化 */
+      @media (max-width: 576px) {
+        .table-responsive {
+          overflow-x: auto;
+        }
+        .btn-group-sm {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        .btn-group-sm .btn {
+          margin-bottom: 5px;
+        }
       }
     </style>
   </head>
@@ -29,103 +77,383 @@
       <form id="quoteForm" method="POST">
         <div class="row">
           <!-- 左側：基本資料 -->
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label for="logoUrl" class="form-label">Logo URL（請注意 CORS 問題）</label>
-              <input type="text" class="form-control" id="logoUrl" name="logoUrl" placeholder="例如：https://example.com/logo.png" value="" />
+          <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card mb-4">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">乙方資料（報價方）</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12 mb-3">
+                    <label for="logoUrl" class="form-label">Logo URL（請注意 CORS 問題）</label>
+                    <input type="text" class="form-control" id="logoUrl" name="logoUrl" placeholder="例如：https://example.com/logo.png" value="https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc" />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="providerName" class="form-label">乙方名稱</label>
+                    <input type="text" class="form-control" id="providerName" name="providerName" value="小牛甕烤餅" placeholder="例如：小牛甕烤餅" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="providerPhone" class="form-label">乙方電話</label>
+                    <input type="text" class="form-control" id="providerPhone" name="providerPhone" value="0908809853" placeholder="例如：0908809853" />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="providerContact" class="form-label">乙方地址</label>
+                    <input type="text" class="form-control" id="providerContact" name="providerContact" value="台中市西區自治街153號一樓" placeholder="例如：台中市西區自治街153號一樓" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="staffName" class="form-label">承辦人</label>
+                    <input type="text" class="form-control" id="staffName" name="staffName" value="劉懿萱" placeholder="例如：劉懿萱" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="providerName" class="form-label">乙方 (報價單位)</label>
-              <input type="text" class="form-control" id="providerName" name="providerName" placeholder="例如：乙方示例公司" required />
+
+            <div class="card mb-4">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0">甲方資料（客戶）</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="customerName" class="form-label">甲方名稱</label>
+                    <input type="text" class="form-control" id="customerName" name="customerName" placeholder="例如：王小明股份有限公司" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="taxId" class="form-label">統一編號</label>
+                    <input type="text" class="form-control" id="taxId" name="taxId" placeholder="例如：12345678" />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="customerAddress" class="form-label">甲方地址</label>
+                    <input type="text" class="form-control" id="customerAddress" name="customerAddress" placeholder="例如：台北市大同區小明路9號9樓" />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="fax" class="form-label">傳真</label>
+                    <input type="text" class="form-control" id="fax" name="fax" placeholder="例如：02-12345678" />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="contactPhone" class="form-label">聯絡電話</label>
+                    <input type="text" class="form-control" id="contactPhone" name="contactPhone" placeholder="例如：0912-345678" />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="contactPerson" class="form-label">聯絡人</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" id="contactPerson" name="contactPerson" placeholder="例如：王小明" />
+                      <select class="form-select" style="max-width: 100px;" id="contactGender" name="contactGender">
+                        <option value="先生">先生</option>
+                        <option value="小姐">小姐</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="providerContact" class="form-label">乙方聯絡資訊</label>
-              <textarea class="form-control" id="providerContact" name="providerContact" rows="3" placeholder="請輸入資訊，例如：&#10;地址：台中市西區示例路 10 號&#10;電話：04-1234567" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="customerName" class="form-label">甲方 (客戶)</label>
-              <input type="text" class="form-control" id="customerName" name="customerName" placeholder="例如：甲方示例企業" required />
-            </div>
-            <div class="mb-3">
-              <label for="customerContact" class="form-label">甲方聯絡資訊</label>
-              <textarea class="form-control" id="customerContact" name="customerContact" rows="3" placeholder="請輸入資訊，例如：&#10;地址：高雄市前鎮區示例路 20 號&#10;電話：07-7654321" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="quoteNumber" class="form-label">報價單編號</label>
-              <input type="text" class="form-control" id="quoteNumber" name="quoteNumber" required />
-            </div>
-            <div class="mb-3">
-              <label for="dateInput" class="form-label">日期</label>
-              <input type="date" class="form-control" id="dateInput" name="date" required />
-            </div>
-            <div class="mb-3">
-              <label for="deadlineInput" class="form-label">截止日期</label>
-              <input type="date" class="form-control" id="deadlineInput" name="deadline" required />
-            </div>
-            <div class="mb-3">
-              <label for="remarks" class="form-label">備註</label>
-              <textarea class="form-control" id="remarks" name="remarks" rows="12" placeholder="例如：此報價僅供參考，請儘快回覆">1.該份報價附屬於事先簽署的合作合約之中，若無則僅供確認記錄留存，請勿蓋章、回簽。
-2.單價不含稅與支付平台手續費用。發票稅為總價 5%，其餘手續費用另記。
-3.頭款與其他款項需另行確認，並於頭款支付完成後開始執行。
-4.尾款支付期為於結案後 7 天內，或於執行前另外約定，遲延給付一日 0.1% 違約金。
-5.我方得以於不涉及甲方營業秘密原則下，保留該作品作為作品集展示之權利。
-6.如規格有異動，需調整報價請另行提出。</textarea>
+
+            <div class="card mb-4">
+              <div class="card-header bg-info text-white">
+                <h5 class="mb-0">報價單資訊</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="quoteNumber" class="form-label">報價單編號</label>
+                    <input type="text" class="form-control" id="quoteNumber" name="quoteNumber" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="dateInput" class="form-label">報價單日期</label>
+                    <input type="date" class="form-control" id="dateInput" name="date" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="deliveryDate" class="form-label">外送日期</label>
+                    <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" onchange="updateDeliveryDay()" />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="deliveryDay" class="form-label">外送星期</label>
+                    <input type="text" class="form-control" id="deliveryDay" name="deliveryDay" readonly />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="deliveryTime" class="form-label">外送時間</label>
+                    <input type="text" class="form-control" id="deliveryTime" name="deliveryTime" placeholder="例如：15:30" />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="storeName" class="form-label">外送地點名稱</label>
+                    <input type="text" class="form-control" id="storeName" name="storeName" placeholder="例如：林酒店" />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="deliveryAddress" class="form-label">外送地址</label>
+                    <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" placeholder="例如：台中市西屯區朝富路99號" />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="remarks" class="form-label">備註</label>
+                    <textarea class="form-control" id="remarks" name="remarks" rows="5">(1)、外送時間:{{deliveryDate}}({{deliveryDay}}){{deliveryTime}}
+(2)、外送地址:{{deliveryAddress}}
+　　　　　　　({{storeName}})
+(3)、四雨防油紙袋單顆包裝
+(4)、訂金為總金額50%，於出貨日三天前付款</textarea>
+                    <div class="mt-2 small text-muted">
+                      <p class="mb-1">變數說明：</p>
+                      <ul class="ps-3 mb-1">
+                        <li>{{deliveryDate}} - 外送日期</li>
+                        <li>{{deliveryDay}} - 外送星期</li>
+                        <li>{{deliveryTime}} - 外送時間</li>
+                        <li>{{deliveryAddress}} - 外送地址</li>
+                        <li>{{storeName}} - 外送地點名稱</li>
+                      </ul>
+                      <p class="mb-0">這些變數會在生成報價單時自動替換為您填寫的相應資料。您也可以直接編輯備註內容。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <!-- 右側：品項明細與金額 -->
-          <div class="col-md-6">
-            <h2>品項細節</h2>
-            <table class="table table-bordered" id="itemsTable">
-              <tbody>
-                <!-- 此處預設不放任何<tr>，直接靠JS動態插入 -->
-              </tbody>
-            </table>
-            <!-- 新增品項 + 刷新 按鈕組（刷新按鈕置右，正方形） -->
-            <div class="d-flex mb-3">
-              <button type="button" id="addItemButton" class="btn btn-primary">
-                ＋ 新增品項
-              </button>
-              <!-- ms-auto 表示往左推，讓按鈕跑到最右邊 -->
-              <button type="button" id="refreshButton" class="btn btn-secondary ms-auto d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="刷新">
-                ↺
-              </button>
+          <div class="col-lg-6 col-md-12">
+            <div class="card mb-4">
+              <div class="card-header bg-warning">
+                <h5 class="mb-0">品項細節</h5>
+              </div>
+              <div class="card-body">
+                <div class="d-flex flex-wrap mb-3">
+                  <div class="btn-group-sm mb-2 me-auto">
+                    <button type="button" id="addBakeryButton" class="btn btn-add-item text-white me-2 mb-1">
+                      ＋ 新增烤餅
+                    </button>
+                    <button type="button" id="addDrinkButton" class="btn btn-info text-white me-2 mb-1">
+                      ＋ 新增飲料
+                    </button>
+                    <button type="button" id="addOtherButton" class="btn btn-secondary me-2 mb-1">
+                      ＋ 新增其他
+                    </button>
+                  </div>
+                  <button type="button" id="refreshButton" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="刷新">
+                    ↺
+                  </button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="itemsTable">
+                    <thead>
+                      <tr>
+                        <th style="width: 30%">品名</th>
+                        <th style="width: 50%">項目</th>
+                        <th style="width: 20%">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- 此處預設不放任何<tr>，直接靠JS動態插入 -->
+                    </tbody>
+                  </table>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-md-4 mb-3">
+                    <label for="taxPercent" class="form-label">稅金百分比 (%)</label>
+                    <input type="number" class="form-control" id="taxPercent" name="taxPercent" step="1" min="0" value="0" required />
+                  </div>
+                  <div class="col-md-8">
+                    <!-- Totals 以兩行表格呈現 -->
+                    <div class="table-responsive">
+                      <table class="table table-bordered text-center">
+                        <tr>
+                          <th>小計</th>
+                          <th>稅金</th>
+                          <th>總計</th>
+                        </tr>
+                        <tr>
+                          <td id="subtotalDisplay">0</td>
+                          <td id="taxDisplay">0</td>
+                          <td id="totalDisplay">0</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="mb-3 mt-3">
-              <label for="taxPercent" class="form-label">稅金百分比 (%)</label>
-              <input type="number" class="form-control" id="taxPercent" name="taxPercent" step="1" min="0" value="0" required />
-            </div>
-            <!-- Totals 以兩行表格呈現 -->
-            <table class="table table-bordered text-center mt-3">
-              <tr>
-                <th>小計</th>
-                <th>稅金</th>
-                <th>總計</th>
-              </tr>
-              <tr>
-                <td id="subtotalDisplay">0</td>
-                <td id="taxDisplay">0</td>
-                <td id="totalDisplay">0</td>
-              </tr>
-            </table>
+            <!-- 浮動的圓形提交按鈕 -->
+            <button type="submit" id="submitButton" class="btn btn-success rounded-circle position-fixed">
+              &#10003;
+            </button>
           </div>
         </div>
-        <!-- 浮動的圓形提交按鈕 -->
-        <button type="submit" id="submitButton" class="btn btn-success rounded-circle position-fixed">
-          &#10003;
-        </button>
       </form>
     </div>
-    <!-- 隱藏的品項模板：數量、單價、刪除 都在同一行 -->
-    <script type="text/template" id="itemTemplate">
+    <!-- 隱藏的品項模板：烤餅 -->
+    <script type="text/template" id="bakeryTemplate">
       <tr class="descRow">
-        <td colspan="3">
-          <textarea
+        <td>
+          <label class="form-label">品名</label>
+          <div class="d-flex flex-wrap">
+            <div class="form-check me-3 mb-2">
+              <input class="form-check-input" type="radio" name="itemType_{{index}}" value="現烤烤餅" id="itemType_{{index}}_1" checked>
+              <label class="form-check-label" for="itemType_{{index}}_1">
+                現烤烤餅
+              </label>
+            </div>
+            <div class="form-check me-3 mb-2">
+              <input class="form-check-input" type="radio" name="itemType_{{index}}" value="冷凍烤餅" id="itemType_{{index}}_2">
+              <label class="form-check-label" for="itemType_{{index}}_2">
+                冷凍烤餅
+              </label>
+            </div>
+          </div>
+        </td>
+        <td>
+          <label class="form-label">項目</label>
+          <select class="form-select" name="itemName">
+            <option value="蔥油蘿蔔">蔥油蘿蔔</option>
+            <option value="香椿蘿蔔">香椿蘿蔔</option>
+            <option value="黃金糖">黃金糖</option>
+            <option value="紅豆泥">紅豆泥</option>
+            <option value="芝麻">芝麻</option>
+            <option value="綠豆沙">綠豆沙</option>
+            <option value="芋頭">芋頭</option>
+          </select>
+        </td>
+        <td rowspan="2" class="align-middle text-center">
+          <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            onclick="removeRow(this)"
+            title="刪除"
+          >
+            X
+          </button>
+        </td>
+      </tr>
+      <tr class="numberRow">
+        <td>
+          <label class="form-label">數量</label>
+          <input
+            type="number"
             class="form-control"
-            name="itemDescription"
-            placeholder="品項描述"
-            rows="3"
+            name="itemQuantity"
+            step="1"
+            min="1"
+            value="1"
             required
+          />
+        </td>
+        <td>
+          <label class="form-label">單價</label>
+          <input
+            type="number"
+            class="form-control"
+            name="itemUnitPrice"
+            step="1"
+            min="0"
+            value="30"
+            required
+          />
+        </td>
+      </tr>
+    </script>
+
+    <!-- 隱藏的品項模板：飲料 -->
+    <script type="text/template" id="drinkTemplate">
+      <tr class="descRow">
+        <td>
+          <label class="form-label">品名</label>
+          <input type="hidden" name="itemType_{{index}}" value="飲料">
+          <input
+            type="text"
+            class="form-control"
+            name="itemType_{{index}}_display"
+            value="飲料"
+            readonly
+          />
+        </td>
+        <td>
+          <label class="form-label">項目</label>
+          <input
+            type="text"
+            class="form-control"
+            name="itemName"
+            placeholder="請輸入飲料名稱"
+            value="飲料"
+          />
+          <textarea
+            class="form-control mt-2"
+            name="itemDescription"
+            placeholder="請輸入飲料描述"
+            rows="1"
           ></textarea>
+        </td>
+        <td rowspan="2" class="align-middle text-center">
+          <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            onclick="removeRow(this)"
+            title="刪除"
+          >
+            X
+          </button>
+        </td>
+      </tr>
+      <tr class="numberRow">
+        <td>
+          <label class="form-label">數量</label>
+          <input
+            type="number"
+            class="form-control"
+            name="itemQuantity"
+            step="1"
+            min="1"
+            value="1"
+            required
+          />
+        </td>
+        <td>
+          <label class="form-label">單價</label>
+          <input
+            type="number"
+            class="form-control"
+            name="itemUnitPrice"
+            step="1"
+            min="0"
+            value="25"
+            required
+          />
+        </td>
+      </tr>
+    </script>
+
+    <!-- 隱藏的品項模板：其他 -->
+    <script type="text/template" id="otherTemplate">
+      <tr class="descRow">
+        <td>
+          <label class="form-label">品名</label>
+          <input type="hidden" name="itemType_{{index}}" value="其他">
+          <input
+            type="text"
+            class="form-control"
+            name="itemType_{{index}}_display"
+            value="其他"
+            readonly
+          />
+        </td>
+        <td>
+          <label class="form-label">項目</label>
+          <input
+            type="text"
+            class="form-control"
+            name="itemName"
+            placeholder="請輸入品名"
+            value="其他項目"
+          />
+          <textarea
+            class="form-control mt-2"
+            name="itemDescription"
+            placeholder="請輸入描述"
+            rows="1"
+          ></textarea>
+        </td>
+        <td rowspan="2" class="align-middle text-center">
+          <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            onclick="removeRow(this)"
+            title="刪除"
+          >
+            X
+          </button>
         </td>
       </tr>
       <tr class="numberRow">
@@ -153,40 +481,22 @@
             required
           />
         </td>
-        <td class="delete-cell align-middle">
-          <button
-            type="button"
-            class="btn btn-danger btn-sm"
-            onclick="removeRow(this)"
-            title="刪除"
-          >
-            X
-          </button>
-        </td>
       </tr>
     </script>
+
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    // 設定日期預設值：後天及後 14 天
+    // 設定日期預設值：今天
     function setDefaultDates() {
       const today = new Date();
-      today.setDate(today.getDate() + 2);
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, "0");
       const dd = String(today.getDate()).padStart(2, "0");
       const todayStr = `${yyyy}-${mm}-${dd}`;
       $("#dateInput").val(todayStr);
-
-      const deadline = new Date(today);
-      deadline.setDate(deadline.getDate() + 14);
-      const yyyy2 = deadline.getFullYear();
-      const mm2 = String(deadline.getMonth() + 1).padStart(2, "0");
-      const dd2 = String(deadline.getDate()).padStart(2, "0");
-      const deadlineStr = `${yyyy2}-${mm2}-${dd2}`;
-      $("#deadlineInput").val(deadlineStr);
     }
 
     // 產生報價單編號：格式 EST + (最後兩位年份 + 月日小時分鐘 + 隨機一位數)
@@ -201,12 +511,50 @@
       return "EST" + yy + mm + dd + hh + min + rand;
     }
 
-    // 新增品項（描述 + 數量 / 單價 / 刪除）
-    function addRow() {
+    // 新增烤餅項目
+    function addBakeryItem() {
       // 取出模板裡的 HTML 字串
-      const templateHtml = $("#itemTemplate").html();
+      let templateHtml = $("#bakeryTemplate").html();
+      
+      // 生成唯一索引，用于radio按钮的name和id
+      const index = Date.now();
+      templateHtml = templateHtml.replace(/{{index}}/g, index);
+      
       // 加到表格 <tbody>
       $("#itemsTable tbody").append(templateHtml);
+      
+      // 新增完後即刻重新計算
+      updateTotals();
+    }
+
+    // 新增飲料項目
+    function addDrinkItem() {
+      // 取出模板裡的 HTML 字串
+      let templateHtml = $("#drinkTemplate").html();
+      
+      // 生成唯一索引，用于隐藏字段的name
+      const index = Date.now();
+      templateHtml = templateHtml.replace(/{{index}}/g, index);
+      
+      // 加到表格 <tbody>
+      $("#itemsTable tbody").append(templateHtml);
+      
+      // 新增完後即刻重新計算
+      updateTotals();
+    }
+
+    // 新增其他項目
+    function addOtherItem() {
+      // 取出模板裡的 HTML 字串
+      let templateHtml = $("#otherTemplate").html();
+      
+      // 生成唯一索引，用于隐藏字段的name
+      const index = Date.now();
+      templateHtml = templateHtml.replace(/{{index}}/g, index);
+      
+      // 加到表格 <tbody>
+      $("#itemsTable tbody").append(templateHtml);
+      
       // 新增完後即刻重新計算
       updateTotals();
     }
@@ -214,15 +562,15 @@
     // 刪除品項（包含描述那一行 + 數值那一行）
     function removeRow(button) {
       const $btn = $(button);
-      // 數量/單價那一行
-      const $rowNumbers = $btn.closest("tr");
-      // 描述那一行在它上面
-      const $rowDesc = $rowNumbers.prev("tr");
+      // 找到包含按钮的行
+      const $row = $btn.closest("tr");
+      // 找到相关的另一行（可能在上面或下面）
+      const $relatedRow = $row.hasClass("descRow") ? $row.next() : $row.prev();
 
       // 至少保留一組品項
       if ($("#itemsTable tbody tr").length > 2) {
-        $rowDesc.remove();
-        $rowNumbers.remove();
+        $row.remove();
+        $relatedRow.remove();
         updateTotals();
       } else {
         alert("至少需保留一個品項");
@@ -244,9 +592,9 @@
       const tax = Math.floor((subtotal * taxPercent) / 100);
       const total = subtotal + tax;
 
-      $("#subtotalDisplay").text(subtotal);
-      $("#taxDisplay").text(tax);
-      $("#totalDisplay").text(total);
+      $("#subtotalDisplay").text(subtotal.toLocaleString());
+      $("#taxDisplay").text(tax.toLocaleString());
+      $("#totalDisplay").text(total.toLocaleString());
     }
 
     // 事件：若輸入框 blur 時發現為空，就改成 "0"
@@ -265,85 +613,82 @@
       updateTotals();
     }
 
-    // 預設假資料（新假資料）
-    function getDefaultFakeData() {
-      return {
-        logoUrl: "https://jerryzheli.com/assets_files/img/J.png",
-        providerName: "乙方示例公司",
-        providerContact: "地址：台中市西區示例路 10 號\n電話：04-1234567",
-        customerName: "甲方示例企業",
-        customerContact: "地址：高雄市前鎮區示例路 20 號\n電話：07-7654321",
-        taxPercent: 5,
-        remarks: `1.該份報價附屬於事先簽署的合作合約之中，若無則僅供確認記錄留存，請勿蓋章、回簽。
-2.單價不含稅與支付平台手續費用。發票稅為總價 5%，其餘手續費用另記。
-3.頭款與其他款項需另行確認，並於頭款支付完成後開始執行。
-4.尾款支付期為於結案後 7 天內，或於執行前另外約定，遲延給付一日 0.1% 違約金。
-5.我方得以於不涉及甲方營業秘密原則下，保留該作品作為作品集展示之權利。
-6.如規格有異動，需調整報價請另行提出。`,
-        items: [
-          { desc: "雲端伺服器架設[優惠]", qty: 1, price: 0 },
-          { desc: "購買網域/DNS一年份、代管", qty: 1, price: 1000 },
-          { desc: "管理端功能實作", qty: 1, price: 100000 },
-          { desc: "客戶端實作", qty: 1, price: 150000 },
-        ],
-      };
+    // 根据日期更新星期几
+    function updateDeliveryDay() {
+      const deliveryDateInput = document.getElementById('deliveryDate');
+      const deliveryDayInput = document.getElementById('deliveryDay');
+      
+      if (deliveryDateInput.value) {
+        const date = new Date(deliveryDateInput.value);
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        const weekday = weekdays[date.getDay()];
+        deliveryDayInput.value = weekday;
+        
+        // 更新備註中的變數
+        updateRemarks();
+      } else {
+        deliveryDayInput.value = '';
+      }
     }
 
-    // 自動填入預設假資料
-    function autofillForm() {
-      const data = getDefaultFakeData();
+    // 更新備註中的變數
+    function updateRemarks() {
+      const deliveryDate = $("#deliveryDate").val() || '';
+      const deliveryDay = $("#deliveryDay").val() || '';
+      const deliveryTime = $("#deliveryTime").val() || '';
+      const deliveryAddress = $("#deliveryAddress").val() || '';
+      const storeName = $("#storeName").val() || '';
+      
+      // 檢查備註是否為默認格式，如果用戶已修改則不覆蓋
+      const currentRemarks = $("#remarks").val();
+      const isDefaultFormat = currentRemarks.includes('(1)、外送時間:') && 
+                              currentRemarks.includes('(2)、外送地址:') &&
+                              currentRemarks.includes('(3)、四雨防油紙袋單顆包裝') &&
+                              currentRemarks.includes('(4)、訂金為總金額50%');
+      
+      // 只有在首次加載或備註為默認格式時才更新
+      if (isDefaultFormat || currentRemarks.trim() === '') {
+        let remarksText = `(1)、外送時間:${deliveryDate}(${deliveryDay})${deliveryTime}
+(2)、外送地址:${deliveryAddress}(${storeName})
+(3)、四雨防油紙袋單顆包裝
+(4)、訂金為總金額50%，於出貨日三天前付款`;
+        
+        $("#remarks").val(remarksText);
+      }
+    }
 
-      // 填入左側基本資料
-      $("#logoUrl").val(data.logoUrl);
-      $("#providerName").val(data.providerName);
-      $("#providerContact").val(data.providerContact);
-      $("#customerName").val(data.customerName);
-      $("#customerContact").val(data.customerContact);
-      $("#taxPercent").val(data.taxPercent);
-      $("#remarks").val(data.remarks);
-
-      // 先清空品項表格
-      $("#itemsTable tbody").empty();
-
-      // 依據資料 新增多筆品項
-      data.items.forEach(function(item) {
-        // 1) 拿到模板字串
-        const templateHtml = $("#itemTemplate").html();
-        // 2) parseHTML 後包成 jQuery 物件
-        const $cloned = $($.parseHTML(templateHtml));
-
-        // 3) 填入品項資料
-        $cloned.filter(".descRow")
-          .find('textarea[name="itemDescription"]')
-          .val(item.desc);
-
-        $cloned.filter(".numberRow")
-          .find('input[name="itemQuantity"]')
-          .val(item.qty);
-
-        $cloned.filter(".numberRow")
-          .find('input[name="itemUnitPrice"]')
-          .val(item.price);
-
-        // 4) 加到表格
-        $("#itemsTable tbody").append($cloned);
-      });
-
-      // 最後更新合計
-      updateTotals();
+    // 調整UI以適應不同屏幕尺寸
+    function adjustUIForScreenSize() {
+      const windowWidth = $(window).width();
+      
+      if (windowWidth < 768) {
+        // 在小屏幕上調整表格
+        $("#itemsTable").addClass("table-sm");
+      } else {
+        $("#itemsTable").removeClass("table-sm");
+      }
     }
 
     $(document).ready(function() {
       // 預設日期
       setDefaultDates();
+      
+      // 設置外送日期為今天並更新星期幾
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+      $("#deliveryDate").val(todayStr);
+      updateDeliveryDay();
 
       // 報價單編號沒填就自動產生一個
       if (!$("#quoteNumber").val()) {
         $("#quoteNumber").val(generateQuoteNumber());
       }
 
-      // 一開始先新增一筆空的項目
-      addRow();
+      // 一開始先新增一筆烤餅項目
+      addBakeryItem();
 
       // 1) 手動更新「稅金百分比」時立即計算
       $("#taxPercent").on("input", updateTotals);
@@ -371,9 +716,24 @@
         'input[name="itemQuantity"]',
         handleBlurSetOne
       );
+      
+      // 監聽外送相關欄位的變更，以更新備註（僅在初始狀態下）
+      $("#deliveryDate, #deliveryTime, #deliveryAddress, #storeName").on("change", function() {
+        // 只有當備註為默認格式時才更新
+        const currentRemarks = $("#remarks").val();
+        const isDefaultFormat = currentRemarks.includes('(1)、外送時間:') && 
+                                currentRemarks.includes('(2)、外送地址:') &&
+                                currentRemarks.includes('(3)、四雨防油紙袋單顆包裝') &&
+                                currentRemarks.includes('(4)、訂金為總金額50%');
+        if (isDefaultFormat) {
+          updateRemarks();
+        }
+      });
 
       // 綁定「新增品項」按鈕
-      $("#addItemButton").on("click", addRow);
+      $("#addBakeryButton").on("click", addBakeryItem);
+      $("#addDrinkButton").on("click", addDrinkItem);
+      $("#addOtherButton").on("click", addOtherItem);
 
       // 綁定「刷新」按鈕
       $("#refreshButton").on("click", function() {
@@ -400,9 +760,16 @@
           e.preventDefault(); // 使用者按下「取消」，阻止送出
         }
       });
+      
+      // 初始調整UI
+      adjustUIForScreenSize();
+      
+      // 窗口大小變化時調整UI
+      $(window).on("resize", adjustUIForScreenSize);
+      
+      // 初始更新備註
+      updateRemarks();
     });
-
     </script>
   </body>
-
 </html>
