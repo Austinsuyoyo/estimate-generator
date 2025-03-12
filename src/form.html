@@ -85,8 +85,8 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-12 mb-3">
-                    <label for="logoUrl" class="form-label">Logo URL（請注意 CORS 問題）</label>
-                    <input type="text" class="form-control" id="logoUrl" name="logoUrl" placeholder="例如：https://example.com/logo.png" value="https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc" />
+                    <label for="providerLogo" class="form-label">Logo URL（請注意 CORS 問題）</label>
+                    <input type="text" class="form-control" id="providerLogo" name="providerLogo" placeholder="例如：https://example.com/logo.png" value="https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc" />
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="providerName" class="form-label">乙方名稱</label>
@@ -110,28 +110,28 @@
 
             <div class="card mb-4">
               <div class="card-header bg-success text-white">
-                <h5 class="mb-0">甲方資料（客戶）</h5>
+                <h5 class="mb-0">客戶資料</h5>
               </div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <label for="customerName" class="form-label">甲方名稱</label>
+                    <label for="customerName" class="form-label">客戶名稱</label>
                     <input type="text" class="form-control" id="customerName" name="customerName" placeholder="例如：王小明股份有限公司" required />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="customerTaxId" class="form-label">甲方統一編號</label>
+                    <label for="customerTaxId" class="form-label">客戶統一編號</label>
                     <input type="text" class="form-control" id="customerTaxId" name="customerTaxId" placeholder="例如：12345678" />
                   </div>
                   <div class="col-md-12 mb-3">
-                    <label for="customerAddress" class="form-label">甲方地址</label>
+                    <label for="customerAddress" class="form-label">客戶地址</label>
                     <input type="text" class="form-control" id="customerAddress" name="customerAddress" placeholder="例如：台北市大同區小明路9號9樓" />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="customerPhone" class="form-label">甲方電話</label>
+                    <label for="customerPhone" class="form-label">客戶電話</label>
                     <input type="text" class="form-control" id="customerPhone" name="customerPhone" placeholder="例如：02-12345678" />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="customerFax" class="form-label">傳真</label>
+                    <label for="customerFax" class="form-label">客戶傳真</label>
                     <input type="text" class="form-control" id="customerFax" name="customerFax" placeholder="例如：02-12345678" />
                   </div>
                   <div class="col-md-12 mb-3">
@@ -163,8 +163,8 @@
                     <input type="text" class="form-control" id="quoteNumber" name="quoteNumber" required />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="dateInput" class="form-label">報價日期</label>
-                    <input type="date" class="form-control" id="dateInput" name="date" required />
+                    <label for="quoteDate" class="form-label">報價日期</label>
+                    <input type="date" class="form-control" id="quoteDate" name="quoteDate" required />
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="orderType" class="form-label">訂單形式</label>
@@ -286,108 +286,40 @@
             </button>
           </div>
         </div>
-      </form>
-    </div>
-    <!-- 隱藏的品項模板：烤餅 -->
-    <script type="text/template" id="bakeryTemplate">
-      <tr class="descRow">
-        <td>
-          <label class="form-label">品名</label>
-          <div class="d-flex flex-wrap">
-            <div class="form-check me-3 mb-2">
-              <input class="form-check-input" type="radio" name="itemType_{{index}}" value="現烤烤餅" id="itemType_{{index}}_1" checked>
-              <label class="form-check-label" for="itemType_{{index}}_1">
-                現烤烤餅
-              </label>
+        <div class="col-12 mt-2">
+          <!-- 匯入 & 匯出 區塊 -->
+          <div class="mb-4 mt-5">
+            <hr> <!-- 分隔線，表示這是系統功能 -->
+            <h3 class="text-center">系統功能</h3>
+            <!-- 匯出 JSON -->
+            <div class="mb-3">
+              <label for="exportedJson" class="form-label">匯出 JSON</label>
+              <textarea class="form-control" id="exportedJson" rows="5" readonly></textarea>
+              <button type="button" class="btn btn-primary mt-2" onclick="exportFormData()">匯出</button>
+              <button type="button" class="btn btn-secondary mt-2" onclick="copyExportedJson()">複製 JSON</button>
+              <button type="button" class="btn btn-secondary mt-2" onclick="downloadJson()">下載 JSON</button>
             </div>
-            <div class="form-check me-3 mb-2">
-              <input class="form-check-input" type="radio" name="itemType_{{index}}" value="冷凍烤餅" id="itemType_{{index}}_2">
-              <label class="form-check-label" for="itemType_{{index}}_2">
-                冷凍烤餅
-              </label>
+            <!-- 匯入 JSON -->
+            <div class="mb-3">
+              <label for="importJson" class="form-label">匯入 JSON</label>
+              <textarea class="form-control" id="importJson" rows="5" placeholder="請貼上 JSON"></textarea>
+              <button type="button" class="btn btn-success mt-2" onclick="importFormData()">匯入</button>
             </div>
           </div>
-        </td>
-        <td>
-          <label class="form-label">項目</label>
-          <select class="form-select" name="itemName">
-            <option value="蔥油蘿蔔">蔥油蘿蔔</option>
-            <option value="香椿蘿蔔">香椿蘿蔔</option>
-            <option value="黃金糖">黃金糖</option>
-            <option value="紅豆泥">紅豆泥</option>
-            <option value="芝麻">芝麻</option>
-            <option value="綠豆沙">綠豆沙</option>
-            <option value="芋頭">芋頭</option>
-          </select>
-        </td>
-        <td rowspan="2" class="align-middle text-center">
-          <button
-            type="button"
-            class="btn btn-danger btn-sm"
-            onclick="removeRow(this)"
-            title="刪除"
-          >
-            X
-          </button>
-        </td>
-      </tr>
-      <tr class="numberRow">
-        <td>
-          <label class="form-label">數量</label>
-          <input
-            type="number"
-            class="form-control"
-            name="itemQuantity"
-            step="1"
-            min="1"
-            value="1"
-            required
-          />
-        </td>
-        <td>
-          <label class="form-label">單價</label>
-          <input
-            type="number"
-            class="form-control"
-            name="itemUnitPrice"
-            step="1"
-            min="0"
-            value="30"
-            required
-          />
-        </td>
-      </tr>
-    </script>
-
-    <!-- 隱藏的品項模板：飲料 -->
-    <script type="text/template" id="drinkTemplate">
+          <!-- ./ -->
+        </div>
+      </form>
+    </div>
+    <!-- 通用品項模板 -->
+    <script type="text/template" id="itemTemplate">
       <tr class="descRow">
         <td>
           <label class="form-label">品名</label>
-          <input type="hidden" name="itemType_{{index}}" value="飲料">
-          <input
-            type="text"
-            class="form-control"
-            name="itemType_{{index}}_display"
-            value="飲料"
-            readonly
-          />
+          {{typeContent}}
         </td>
         <td>
           <label class="form-label">項目</label>
-          <input
-            type="text"
-            class="form-control"
-            name="itemName"
-            placeholder="請輸入飲料名稱"
-            value="飲料"
-          />
-          <textarea
-            class="form-control mt-2"
-            name="itemDescription"
-            placeholder="請輸入飲料描述"
-            rows="1"
-          ></textarea>
+          {{nameContent}}
         </td>
         <td rowspan="2" class="align-middle text-center">
           <button
@@ -409,7 +341,7 @@
             name="itemQuantity"
             step="1"
             min="1"
-            value="1"
+            value="{{defaultQty}}"
             required
           />
         </td>
@@ -421,76 +353,7 @@
             name="itemUnitPrice"
             step="1"
             min="0"
-            value="25"
-            required
-          />
-        </td>
-      </tr>
-    </script>
-
-    <!-- 隱藏的品項模板：其他 -->
-    <script type="text/template" id="otherTemplate">
-      <tr class="descRow">
-        <td>
-          <label class="form-label">品名</label>
-          <input type="hidden" name="itemType_{{index}}" value="其他">
-          <input
-            type="text"
-            class="form-control"
-            name="itemType_{{index}}_display"
-            value="其他"
-            readonly
-          />
-        </td>
-        <td>
-          <label class="form-label">項目</label>
-          <input
-            type="text"
-            class="form-control"
-            name="itemName"
-            placeholder="請輸入品名"
-            value="其他項目"
-          />
-          <textarea
-            class="form-control mt-2"
-            name="itemDescription"
-            placeholder="請輸入描述"
-            rows="1"
-          ></textarea>
-        </td>
-        <td rowspan="2" class="align-middle text-center">
-          <button
-            type="button"
-            class="btn btn-danger btn-sm"
-            onclick="removeRow(this)"
-            title="刪除"
-          >
-            X
-          </button>
-        </td>
-      </tr>
-      <tr class="numberRow">
-        <td>
-          <label class="form-label">數量</label>
-          <input
-            type="number"
-            class="form-control"
-            name="itemQuantity"
-            step="1"
-            min="1"
-            value="1"
-            required
-          />
-        </td>
-        <td>
-          <label class="form-label">單價</label>
-          <input
-            type="number"
-            class="form-control"
-            name="itemUnitPrice"
-            step="1"
-            min="0"
-            value="0"
+            value="{{defaultPrice}}"
             required
           />
         </td>
@@ -509,7 +372,7 @@
       const mm = String(today.getMonth() + 1).padStart(2, "0");
       const dd = String(today.getDate()).padStart(2, "0");
       const todayStr = `${yyyy}-${mm}-${dd}`;
-      $("#dateInput").val(todayStr);
+      $("#quoteDate").val(todayStr);
     }
 
     // 產生報價單編號：格式 EST + (最後兩位年份 + 月日小時分鐘 + 隨機一位數)
@@ -524,46 +387,72 @@
       return "EST" + yy + mm + dd + hh + min + rand;
     }
 
-    // 新增烤餅項目
-    function addBakeryItem() {
-      // 取出模板裡的 HTML 字串
-      let templateHtml = $("#bakeryTemplate").html();
-      
-      // 生成唯一索引，用于radio按钮的name和id
-      const index = Date.now();
-      templateHtml = templateHtml.replace(/{{index}}/g, index);
-      
-      // 加到表格 <tbody>
-      $("#itemsTable tbody").append(templateHtml);
-      
-      // 新增完後即刻重新計算
-      updateTotals();
-    }
+    // 用於生成唯一索引的計數器
+    let itemIndexCounter = 0;
 
-    // 新增飲料項目
-    function addDrinkItem() {
+    // 合併後的通用添加項目函數
+    function addItem(type) {
       // 取出模板裡的 HTML 字串
-      let templateHtml = $("#drinkTemplate").html();
+      let templateHtml = $("#itemTemplate").html();
       
-      // 生成唯一索引，用于隐藏字段的name
-      const index = Date.now();
-      templateHtml = templateHtml.replace(/{{index}}/g, index);
+      // 生成唯一索引 - 使用時間戳加計數器確保唯一性
+      const index = Date.now() + '_' + (itemIndexCounter++);
       
-      // 加到表格 <tbody>
-      $("#itemsTable tbody").append(templateHtml);
+      // 根據類型設定不同的內容
+      let typeContent = '';
+      let nameContent = '';
+      let defaultQty = '1';
+      let defaultPrice = '0';
       
-      // 新增完後即刻重新計算
-      updateTotals();
-    }
-
-    // 新增其他項目
-    function addOtherItem() {
-      // 取出模板裡的 HTML 字串
-      let templateHtml = $("#otherTemplate").html();
+      switch(type) {
+        case 'bakery':
+          typeContent = `<div class="d-flex flex-wrap">
+            <div class="form-check me-3 mb-2">
+              <input class="form-check-input" type="radio" name="itemType_${index}" value="現烤烤餅" id="itemType_${index}_1" checked>
+              <label class="form-check-label" for="itemType_${index}_1">現烤烤餅</label>
+            </div>
+            <div class="form-check me-3 mb-2">
+              <input class="form-check-input" type="radio" name="itemType_${index}" value="冷凍烤餅" id="itemType_${index}_2">
+              <label class="form-check-label" for="itemType_${index}_2">冷凍烤餅</label>
+            </div>
+          </div>`;
+          
+          nameContent = `<select class="form-select" name="itemName">
+            <option value="蔥油蘿蔔">蔥油蘿蔔</option>
+            <option value="香椿蘿蔔">香椿蘿蔔</option>
+            <option value="黃金糖">黃金糖</option>
+            <option value="紅豆泥">紅豆泥</option>
+            <option value="芝麻">芝麻</option>
+            <option value="綠豆沙">綠豆沙</option>
+            <option value="芋頭">芋頭</option>
+          </select>`;
+          defaultPrice = '30';
+          break;
+          
+        case 'drink':
+          typeContent = `<input type="hidden" name="itemType_${index}" value="飲料">
+            <input type="text" class="form-control" name="itemType_${index}_display" value="飲料" readonly />`;
+          
+          nameContent = `<input type="text" class="form-control" name="itemName" placeholder="請輸入飲料名稱" value="飲料" />
+            <textarea class="form-control mt-2" name="itemDescription" placeholder="請輸入飲料描述" rows="1"></textarea>`;
+          defaultPrice = '25';
+          break;
+          
+        case 'other':
+          typeContent = `<input type="hidden" name="itemType_${index}" value="其他">
+            <input type="text" class="form-control" name="itemType_${index}_display" value="其他" readonly />`;
+          
+          nameContent = `<input type="text" class="form-control" name="itemName" placeholder="請輸入品名" value="其他項目" />
+            <textarea class="form-control mt-2" name="itemDescription" placeholder="請輸入描述" rows="1"></textarea>`;
+          break;
+      }
       
-      // 生成唯一索引，用于隐藏字段的name
-      const index = Date.now();
-      templateHtml = templateHtml.replace(/{{index}}/g, index);
+      // 替換模板中的變數
+      templateHtml = templateHtml
+        .replace(/{{typeContent}}/g, typeContent)
+        .replace(/{{nameContent}}/g, nameContent)
+        .replace(/{{defaultQty}}/g, defaultQty)
+        .replace(/{{defaultPrice}}/g, defaultPrice);
       
       // 加到表格 <tbody>
       $("#itemsTable tbody").append(templateHtml);
@@ -686,7 +575,7 @@
 
     function getDefaultFakeData() {
       return {
-        logoUrl: "https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc",
+        providerLogo: "https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc",
         providerName: "小牛甕烤餅",
         providerPhone: "0908809853",
         providerAddress: "台中市西區自治街153號一樓",
@@ -701,31 +590,18 @@
         contactAddresss: "台中市西屯區台灣大道9527號",
         deliveryTime: "15:30",
         deliveryStoreName: "測試大樓",
-        taxPercent: "0"
+        taxPercent: "0",
+        quoteDate: new Date().toISOString().split('T')[0]
       };
     }
 
     async function autofillForm() {
       const data = getDefaultFakeData();
 
-      // 先填入基本資料
-      $("#logoUrl").val(data.logoUrl);
-      $("#providerName").val(data.providerName);
-      $("#providerPhone").val(data.providerPhone);
-      $("#providerAddress").val(data.providerAddress);
-      $("#providerStaffName").val(data.providerStaffName);
-      $("#customerName").val(data.customerName);
-      $("#customerTaxId").val(data.customerTaxId);
-      $("#customerAddress").val(data.customerAddress);
-      $("#customerPhone").val(data.customerPhone);
-      $("#contactPhone").val(data.contactPhone);
-      $("#contactName").val(data.contactName);
-      $("#contactGender").val(data.contactGender);
-      $("#deliveryTime").val(data.deliveryTime);
-      $("#deliveryStoreName").val(data.deliveryStoreName);
-      $("#contactAddresss").val(data.contactAddresss);
-      $("#taxPercent").val(data.taxPercent);
-      $("#orderType").val("外送");
+      // 使用 Object.entries 簡化表單填充
+      Object.entries(data).forEach(([key, value]) => {
+        $(`#${key}`).val(value);
+      });
       
       // 設定外送日期為當前日期的一個月後
       const today = new Date();
@@ -736,85 +612,77 @@
       const dd = String(oneMonthLater.getDate()).padStart(2, "0");
       const oneMonthLaterStr = `${yyyy}-${mm}-${dd}`;
       $("#deliveryDate").val(oneMonthLaterStr);
+      $("#orderType").val("外送");
 
       // 清空現有項目
       $("#itemsTable tbody").empty();
 
       // 定義所有口味
       const flavors = [
-        "蔥油蘿蔔",
-        "香椿蘿蔔",
-        "黃金糖",
-        "紅豆泥",
-        "芝麻",
-        "綠豆沙",
-        "芋頭"
+        "蔥油蘿蔔", "香椿蘿蔔", "黃金糖", "紅豆泥", "芝麻", "綠豆沙", "芋頭"
       ];
 
-      // 使用 Promise 來確保每個項目都正確添加
-      const addItem = (type, index) => {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            if (type === 'bakery') {
-              addBakeryItem();
-            } else if (type === 'drink') {
-              addDrinkItem();
-            } else if (type === 'other') {
-              addOtherItem();
-            }
-            resolve();
-          }, 100); // 每個項目添加間隔 100ms
-        });
-      };
+      // 使用 Promise.all 批量添加項目
+      const addItemPromises = [];
+      
+      // 添加烤餅項目
+      flavors.forEach(() => {
+        addItemPromises.push(addItemAsync('bakery'));
+      });
+      
+      // 添加飲料和運送費
+      addItemPromises.push(addItemAsync('drink'));
+      addItemPromises.push(addItemAsync('other'));
+      
+      // 等待所有項目添加完成
+      await Promise.all(addItemPromises);
+      
+      // 設置項目值
+      setTimeout(setupItemValues, 300, flavors);
+    }
 
-      // 依序添加烤餅項目
-      for (let i = 0; i < flavors.length; i++) {
-        await addItem('bakery', i);
-      }
+    // 輔助函數：異步添加項目
+    function addItemAsync(type) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          addItem(type);
+          resolve();
+        }, 50);
+      });
+    }
 
-      // 添加豆漿項目
-      await addItem('drink');
-
-      // 添加運送費
-      await addItem('other');
-
-      // 等待所有項目添加完成後再設置值
-      setTimeout(() => {
-        const $rows = $("#itemsTable tbody tr");
+    // 輔助函數：設置項目值
+    function setupItemValues(flavors) {
+      const $rows = $("#itemsTable tbody tr");
+      
+      // 設置烤餅項目
+      flavors.forEach((flavor, index) => {
+        const descRow = $rows[index * 2];
+        const numRow = $rows[index * 2 + 1];
         
-        // 設置烤餅項目
-        flavors.forEach((flavor, index) => {
-          const descRow = $rows[index * 2];
-          const numRow = $rows[index * 2 + 1];
-          
-          // 確保選擇"現烤烤餅"選項
-          $(descRow).find('input[name^="itemType_"][value="現烤烤餅"]').prop('checked', true);
-          $(descRow).find('select[name="itemName"]').val(flavor);
-          $(numRow).find('input[name="itemQuantity"]').val("20");
-          $(numRow).find('input[name="itemUnitPrice"]').val("30");
-        });
+        // 確保選擇"現烤烤餅"選項
+        $(descRow).find('input[name^="itemType_"][value="現烤烤餅"]').prop('checked', true);
+        $(descRow).find('select[name="itemName"]').val(flavor);
+        $(numRow).find('input[name="itemQuantity"]').val("20");
+        $(numRow).find('input[name="itemUnitPrice"]').val("30");
+      });
 
-        // 設置豆漿項目
-        const drinkDescRow = $rows[flavors.length * 2];
-        const drinkNumRow = $rows[flavors.length * 2 + 1];
-        
-        $(drinkDescRow).find('input[name="itemName"]').val("豆漿");
-        $(drinkDescRow).find('textarea[name="itemDescription"]').val("微糖去冰");
-        $(drinkNumRow).find('input[name="itemQuantity"]').val("30");
-        $(drinkNumRow).find('input[name="itemUnitPrice"]').val("25");
+      // 設置飲料項目
+      const drinkIndex = flavors.length * 2;
+      $($rows[drinkIndex]).find('input[name="itemName"]').val("豆漿");
+      $($rows[drinkIndex]).find('textarea').val("微糖去冰");
+      $($rows[drinkIndex + 1]).find('input[name="itemQuantity"]').val("30");
+      $($rows[drinkIndex + 1]).find('input[name="itemUnitPrice"]').val("25");
 
-        // 設置運送費
-        const lastDescRow = $rows[$rows.length - 2];
-        const lastNumRow = $rows[$rows.length - 1];
-        
-        $(lastDescRow).find('input[name="itemName"]').val("運送費");
-        $(lastNumRow).find('input[name="itemQuantity"]').val("1");
-        $(lastNumRow).find('input[name="itemUnitPrice"]').val("500");
+      // 設置運送費
+      const lastIndex = $rows.length - 2;
+      $($rows[lastIndex]).find('input[name="itemName"]').val("運送費");
+      $($rows[lastIndex + 1]).find('input[name="itemQuantity"]').val("1");
+      $($rows[lastIndex + 1]).find('input[name="itemUnitPrice"]').val("500");
 
-        updateDeliveryDay();
-        updateRemarks();
-        updateTotals();
-      }, 500); // 等待所有項目添加完成後再設置值
+      updateDeliveryDay();
+      updateRemarks();
+      updateTotals();
     }
 
     // 表單提交前檢查
@@ -835,23 +703,29 @@
       $("#quoteNumber").val(generateQuoteNumber());
       
       // ===== 2. 按鈕事件綁定 =====
-      // 品項按鈕
-      $("#addBakeryButton").click(addBakeryItem);
-      $("#addDrinkButton").click(addDrinkItem);
-      $("#addOtherButton").click(addOtherItem);
+      // 使用事件委託處理按鈕點擊
+      $("#addBakeryButton").click(() => addItem('bakery'));
+      $("#addDrinkButton").click(() => addItem('drink'));
+      $("#addOtherButton").click(() => addItem('other'));
       $("#refreshButton").click(updateTotals);
       
       // ===== 3. 事件監聽 =====
-      // 數量和價格相關
+      // 使用事件委託處理數量和價格變更
       $(document)
         .on("input", "input[name='itemQuantity'], input[name='itemUnitPrice'], #taxPercent", updateTotals)
         .on("blur", "input[name='itemQuantity']", handleBlurSetOne)
         .on("blur", "input[name='itemUnitPrice']", handleBlurSetZero)
-        .on("click", ".btn-delete", function() { removeRow(this); });
+        .on("click", ".btn-danger", function() { removeRow(this); });
       
-      // 外送相關
-      $("#deliveryDate").on("change", updateDeliveryDay);
-      $("#deliveryTime, #contactAddresss, #deliveryStoreName, #validDays").on("change", updateRemarks);
+      // 外送相關 - 合併事件處理
+      $("#deliveryDate").on("change", function() {
+        updateDeliveryDay();
+        updateRemarks();
+      });
+      
+      // 使用事件委託處理備註更新
+      $("#deliveryTime, #contactAddresss, #deliveryStoreName, #validDays")
+        .on("change", updateRemarks);
       
       // 表單提交
       $("#quoteForm").on("submit", function(e) {
@@ -879,7 +753,7 @@
       
       // 預設添加項目
       if ($("#itemsTable tbody tr").length === 0) {
-        addBakeryItem();
+        addItem('bakery');
       }
       
       // 開發環境自動填充
@@ -887,6 +761,287 @@
         autofillForm();
       }
     });
+    </script>
+    <script>
+    // 定義表單欄位配置
+    const FORM_FIELDS = {
+      // 乙方資料（報價方）
+      provider: [
+        { id: "providerLogo", defaultValue: "https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc" },
+        { id: "providerName", defaultValue: "小牛甕烤餅" },
+        { id: "providerAddress", defaultValue: "台中市西區自治街153號一樓" },
+        { id: "providerPhone", defaultValue: "0908809853" },
+        { id: "providerStaffName", defaultValue: "劉懿萱" }
+      ],
+      // 客戶資料
+      customer: [
+        { id: "customerName", defaultValue: "" },
+        { id: "customerAddress", defaultValue: "" },
+        { id: "customerPhone", defaultValue: "" },
+        { id: "customerFax", defaultValue: "" },
+        { id: "customerTaxId", defaultValue: "" }
+      ],
+      // 聯絡人資料
+      contact: [
+        { id: "contactName", defaultValue: "" },
+        { id: "contactPhone", defaultValue: "" },
+        { id: "contactGender", defaultValue: "先生" },
+        { id: "contactAddresss", defaultValue: "" }
+      ],
+      // 報價單資訊
+      quote: [
+        { id: "orderType", defaultValue: "外送" },
+        { id: "quoteNumber", defaultValue: "" },
+        { id: "quoteDate", defaultValue: "" },
+        { id: "deadline", defaultValue: "" },
+        { id: "deliveryDate", defaultValue: "" },
+        { id: "deliveryDay", defaultValue: "" },
+        { id: "deliveryTime", defaultValue: "" },
+        { id: "deliveryStoreName", defaultValue: "" },
+        { id: "taxPercent", defaultValue: "0" },
+        { id: "remarks", defaultValue: "" },
+        { id: "validDays", defaultValue: "7" }
+      ]
+    };
+
+    // 獲取所有表單欄位的平面列表
+    function getAllFormFields() {
+      return Object.values(FORM_FIELDS).flat();
+    }
+
+    // 匯出表單數據為 JSON
+    function exportFormData() {
+      const formData = {};
+      
+      // 從配置中獲取所有欄位並填充數據
+      getAllFormFields().forEach(field => {
+        const elementId = field.id;
+        const jsonKey = field.jsonKey || elementId;
+        formData[jsonKey] = $(`#${elementId}`).val();
+      });
+      
+      // 添加品項數據
+      formData.items = [];
+      
+      // 取得所有品項資料
+      $("#itemsTable tbody tr.descRow").each(function(index) {
+        const $descRow = $(this);
+        const $numberRow = $descRow.next(".numberRow");
+        
+        // 獲取項目類型
+        let type = '';
+        const typeRadio = $descRow.find('input[name^="itemType_"]:checked');
+        const typeHidden = $descRow.find('input[name^="itemType_"][type="hidden"]');
+        
+        if (typeRadio.length) {
+          type = typeRadio.val();
+        } else if (typeHidden.length) {
+          type = typeHidden.val();
+        } else {
+          // 嘗試從其他元素獲取類型
+          const typeDisplayInput = $descRow.find('input[name$="_display"]');
+          if (typeDisplayInput.length) {
+            type = typeDisplayInput.val();
+          }
+        }
+        
+        // 獲取項目名稱
+        let name = '';
+        const nameInput = $descRow.find('input[name="itemName"]');
+        const nameSelect = $descRow.find('select[name="itemName"]');
+        
+        if (nameInput.length) {
+          name = nameInput.val() || '';
+        } else if (nameSelect.length) {
+          name = nameSelect.val() || '';
+        }
+        
+        // 獲取項目描述
+        const desc = $descRow.find('textarea[name="itemDescription"]').val() || '';
+        
+        // 獲取數量和價格
+        const qty = parseInt($numberRow.find('input[name="itemQuantity"]').val(), 10) || 0;
+        const price = parseInt($numberRow.find('input[name="itemUnitPrice"]').val(), 10) || 0;
+
+        formData.items.push({ 
+          type,
+          name, 
+          desc, 
+          qty, 
+          price 
+        });
+      });
+
+      // 顯示 JSON
+      $("#exportedJson").val(JSON.stringify(formData, null, 2));
+    }
+
+    // 複製 JSON 到剪貼簿
+    function copyExportedJson() {
+      const jsonText = $("#exportedJson").val();
+      if (!jsonText) {
+        alert("請先點擊『匯出』按鈕產生 JSON");
+        return;
+      }
+
+      const exportedJson = document.getElementById("exportedJson");
+      exportedJson.select();
+      document.execCommand("copy");
+      alert("JSON 已複製");
+    }
+
+    // 匯入 JSON 到表單
+    function importFormData() {
+      const jsonText = $("#importJson").val();
+
+      try {
+        const data = JSON.parse(jsonText);
+
+        // 先嘗試通過 API 驗證 JSON 格式
+        fetch(window.location.href, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: jsonText
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            // 直接使用本地匯入函數處理數據
+            performLocalImport(data);
+          } else {
+            alert("JSON 格式錯誤：" + (result.message || "請確認格式是否正確"));
+          }
+        })
+        .catch(error => {
+          console.error("匯入錯誤:", error);
+          // 如果 API 請求失敗，仍然嘗試本地匯入
+          performLocalImport(data);
+        });
+      } catch (error) {
+        alert("JSON 格式錯誤，請確認格式是否正確");
+      }
+    }
+
+    // 本地匯入 JSON 數據（當 API 請求失敗時使用）
+    function performLocalImport(data) {
+      try {
+        // 從配置中獲取所有欄位並填充數據
+        getAllFormFields().forEach(field => {
+          const elementId = field.id;
+          const jsonKey = field.jsonKey || elementId;
+          
+          // 如果 JSON 中有對應的值，則填入表單
+          if (data[jsonKey] !== undefined) {
+            $(`#${elementId}`).val(data[jsonKey]);
+          }
+        });
+
+        // 清空品項
+        $("#itemsTable tbody").empty();
+
+        // 依據 JSON 重新新增品項
+        if (data.items && Array.isArray(data.items)) {
+          // 重置計數器，確保匯入時索引是連續的
+          itemIndexCounter = 0;
+          
+          data.items.forEach(function(item) {
+            // 根據項目類型選擇適當的模板
+            let itemType = 'other';
+            if (item.type && item.type.includes('烤餅')) {
+              itemType = 'bakery';
+            } else if (item.type && item.type.includes('飲料')) {
+              itemType = 'drink';
+            }
+            
+            // 添加項目 - 直接調用 addItem 函數，它會自動生成唯一索引
+            addItem(itemType);
+            
+            // 獲取剛添加的項目行
+            const $descRow = $("#itemsTable tbody tr.descRow").last();
+            const $numberRow = $descRow.next(".numberRow");
+            
+            // 設置項目類型
+            if (itemType === 'bakery') {
+              // 根據 item.type 選擇正確的單選按鈕
+              if (item.type === '冷凍烤餅') {
+                $descRow.find('input[name^="itemType_"][value="冷凍烤餅"]').prop('checked', true);
+              } else {
+                $descRow.find('input[name^="itemType_"][value="現烤烤餅"]').prop('checked', true);
+              }
+            } else {
+              const typeInput = $descRow.find('input[name^="itemType_"]');
+              if (typeInput.length) {
+                typeInput.val(item.type || (itemType === 'drink' ? '飲料' : '其他'));
+              }
+              
+              const typeDisplayInput = $descRow.find('input[name$="_display"]');
+              if (typeDisplayInput.length) {
+                typeDisplayInput.val(item.type || (itemType === 'drink' ? '飲料' : '其他'));
+              }
+            }
+            
+            // 設置項目名稱
+            const nameInput = $descRow.find('input[name="itemName"]');
+            const nameSelect = $descRow.find('select[name="itemName"]');
+            
+            if (nameSelect.length && item.name) {
+              // 檢查選項是否存在
+              if (nameSelect.find(`option[value="${item.name}"]`).length) {
+                nameSelect.val(item.name);
+              } else {
+                // 如果選項不存在，添加新選項
+                nameSelect.append(new Option(item.name, item.name));
+                nameSelect.val(item.name);
+              }
+            } else if (nameInput.length && item.name) {
+              nameInput.val(item.name);
+            }
+            
+            // 設置項目描述
+            const descTextarea = $descRow.find('textarea[name="itemDescription"]');
+            if (descTextarea.length && item.desc) {
+              descTextarea.val(item.desc);
+            }
+            
+            // 設置數量和價格
+            $numberRow.find('input[name="itemQuantity"]').val(item.qty || 0);
+            $numberRow.find('input[name="itemUnitPrice"]').val(item.price || 0);
+          });
+        }
+
+        // 更新外送日期相關欄位
+        if (data.deliveryDate) {
+          updateDeliveryDay();
+        }
+        
+        // 重新計算總計
+        updateTotals();
+        alert("JSON 本地匯入成功");
+      } catch (error) {
+        console.error("本地匯入錯誤:", error);
+        alert("JSON 匯入失敗：" + error.message);
+      }
+    }
+
+    // 下載 JSON 檔案
+    function downloadJson() {
+      const jsonText = $("#exportedJson").val();
+      if (!jsonText) {
+        alert("請先點擊『匯出』按鈕產生 JSON");
+        return;
+      }
+
+      const blob = new Blob([jsonText], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `報價單資料＿${new Date().toISOString().replace(/[:.]/g, "_")}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
     </script>
   </body>
 </html>
