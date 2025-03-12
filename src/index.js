@@ -54,29 +54,34 @@ export default {
 
 			const formData = await request.formData();
 			const logoUrl = formData.get("logoUrl") || DEFAULT_LOGO_URL;
+
 			const providerName = formData.get("providerName") || "";
-			const providerContact = formData.get("providerContact") || "";
+			const providerAddress = formData.get("providerAddress") || "";
 			const providerPhone = formData.get("providerPhone") || "";
+			const providerStaffName = formData.get("providerStaffName") || "";
+
 			const customerName = formData.get("customerName") || "";
 			const customerAddress = formData.get("customerAddress") || "";
 			const customerPhone = formData.get("customerPhone") || "";
+			const customerFax = formData.get("customerFax") || "";
+			const customerTaxId = formData.get("customerTaxId") || "";
+
+			const contactName = formData.get("contactName") || "";
+			const contactPhone = formData.get("contactPhone") || "";
+			const contactGender = formData.get("contactGender") || "先生";
+			const contactAddresss = formData.get("contactAddresss") || "";
+
+			const orderType = formData.get("orderType") || ""; 
 			const quoteNumber = formData.get("quoteNumber") || "";
 			const date = formData.get("date") || "";
 			const deadline = formData.get("deadline") || "";
 			const taxPercent = parseFloat(formData.get("taxPercent") || "0");
 			const remarks = formData.get("remarks") || "";
-			
-			const contactPerson = formData.get("contactPerson") || "";
-			const contactPhone = formData.get("contactPhone") || "";
-			const contactGender = formData.get("contactGender") || "先生";
-			const fax = formData.get("fax") || "";
-			const taxId = formData.get("taxId") || "";
+
 			const deliveryDate = formData.get("deliveryDate") || "";
 			const deliveryDay = formData.get("deliveryDay") || "";
 			const deliveryTime = formData.get("deliveryTime") || "";
-			const deliveryAddress = formData.get("deliveryAddress") || "";
-			const storeName = formData.get("storeName") || "";
-			const staffName = formData.get("staffName") || "";
+			const deliveryStoreName = formData.get("deliveryStoreName") || "";
 
 			// 取得所有品項資料（可能有多筆品項）
 			const itemDescriptions = formData.getAll("itemDescription");
@@ -97,8 +102,13 @@ export default {
 				itemTypes.push("現烤烤餅");
 			}
 
+			// 優化處理大量項目的邏輯
 			let itemsHtml = "";
 			let subtotal = 0;
+			
+			// 檢查項目數量，如果超過一定數量，可能需要分頁處理
+			const itemCount = itemQuantities.length;
+			
 			for (let i = 0; i < itemQuantities.length; i++) {
 				const desc = i < itemDescriptions.length ? itemDescriptions[i] : "";
 				const name = i < itemNames.length ? itemNames[i] : "";
@@ -134,8 +144,8 @@ export default {
 				.replace(/{{deliveryDate}}/g, deliveryDate)
 				.replace(/{{deliveryDay}}/g, deliveryDay)
 				.replace(/{{deliveryTime}}/g, deliveryTime)
-				.replace(/{{deliveryAddress}}/g, deliveryAddress)
-				.replace(/{{storeName}}/g, storeName);
+				.replace(/{{contactAddresss}}/g, contactAddresss)
+				.replace(/{{deliveryStoreName}}/g, deliveryStoreName);
 
 			const taxDisplay = taxPercent === 0 ? "內含" : formatNumber(taxAmount);
 
@@ -165,11 +175,19 @@ export default {
 				logoUrl,
 				logoBase64,
 				providerName,
-				providerContact,
+				providerAddress,
 				providerPhone,
+				providerStaffName,
 				customerName,
 				customerAddress,
 				customerPhone,
+				customerFax,
+				customerTaxId,
+				contactName,
+				contactPhone,
+				contactGender,
+				contactAddresss,
+				orderType,
 				quoteNumber,
 				date,
 				deadline,
@@ -180,17 +198,11 @@ export default {
 				taxDisplay: taxDisplay,
 				totalFormatted: formatNumber(total),
 				remarks: processedRemarks.replace(/\n/g, "<br>"),
-				contactPerson,
-				contactGender,
-				contactPhone,
-				fax,
-				taxId,
 				deliveryDate,
 				deliveryDay,
 				deliveryTime,
-				deliveryAddress,
-				storeName,
-				staffName
+				deliveryStoreName,
+				itemCount: itemCount, // 添加項目數量，以便在模板中使用
 			};
 
 			// 使用模板字串替換，產生最終 HTML

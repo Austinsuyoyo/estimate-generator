@@ -97,12 +97,12 @@
                     <input type="text" class="form-control" id="providerPhone" name="providerPhone" value="0908809853" placeholder="例如：0908809853" />
                   </div>
                   <div class="col-md-12 mb-3">
-                    <label for="providerContact" class="form-label">乙方地址</label>
-                    <input type="text" class="form-control" id="providerContact" name="providerContact" value="台中市西區自治街153號一樓" placeholder="例如：台中市西區自治街153號一樓" required />
+                    <label for="providerAddress" class="form-label">乙方地址</label>
+                    <input type="text" class="form-control" id="providerAddress" name="providerAddress" value="台中市西區自治街153號一樓" placeholder="例如：台中市西區自治街153號一樓" required />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="staffName" class="form-label">承辦人</label>
-                    <input type="text" class="form-control" id="staffName" name="staffName" value="劉懿萱" placeholder="例如：劉懿萱" />
+                    <label for="providerStaffName" class="form-label">承辦人</label>
+                    <input type="text" class="form-control" id="providerStaffName" name="providerStaffName" value="劉懿萱" placeholder="例如：劉懿萱" />
                   </div>
                 </div>
               </div>
@@ -119,30 +119,38 @@
                     <input type="text" class="form-control" id="customerName" name="customerName" placeholder="例如：王小明股份有限公司" required />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="taxId" class="form-label">統一編號</label>
-                    <input type="text" class="form-control" id="taxId" name="taxId" placeholder="例如：12345678" />
+                    <label for="customerTaxId" class="form-label">甲方統一編號</label>
+                    <input type="text" class="form-control" id="customerTaxId" name="customerTaxId" placeholder="例如：12345678" />
                   </div>
                   <div class="col-md-12 mb-3">
                     <label for="customerAddress" class="form-label">甲方地址</label>
                     <input type="text" class="form-control" id="customerAddress" name="customerAddress" placeholder="例如：台北市大同區小明路9號9樓" />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="fax" class="form-label">傳真</label>
-                    <input type="text" class="form-control" id="fax" name="fax" placeholder="例如：02-12345678" />
+                    <label for="customerPhone" class="form-label">甲方電話</label>
+                    <input type="text" class="form-control" id="customerPhone" name="customerPhone" placeholder="例如：02-12345678" />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="contactPhone" class="form-label">聯絡電話</label>
-                    <input type="text" class="form-control" id="contactPhone" name="contactPhone" placeholder="例如：0912-345678" />
+                    <label for="customerFax" class="form-label">傳真</label>
+                    <input type="text" class="form-control" id="customerFax" name="customerFax" placeholder="例如：02-12345678" />
                   </div>
                   <div class="col-md-12 mb-3">
-                    <label for="contactPerson" class="form-label">聯絡人</label>
+                    <label for="contactName" class="form-label">聯絡人</label>
                     <div class="input-group">
-                      <input type="text" class="form-control" id="contactPerson" name="contactPerson" placeholder="例如：王小明" />
+                      <input type="text" class="form-control" id="contactName" name="contactName" placeholder="例如：王小明" />
                       <select class="form-select" style="max-width: 100px;" id="contactGender" name="contactGender">
                         <option value="先生">先生</option>
                         <option value="小姐">小姐</option>
                       </select>
                     </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="contactPhone" class="form-label">聯絡人電話</label>
+                    <input type="text" class="form-control" id="contactPhone" name="contactPhone" placeholder="例如：0912-345678" />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label for="contactAddresss" class="form-label">收件地址</label>
+                    <input type="text" class="form-control" id="contactAddresss" name="contactAddresss" placeholder="例如：台北市大同區小明路9號9樓" />
                   </div>
                 </div>
               </div>
@@ -159,8 +167,18 @@
                     <input type="text" class="form-control" id="quoteNumber" name="quoteNumber" required />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="dateInput" class="form-label">報價單日期</label>
+                    <label for="dateInput" class="form-label">報價日期</label>
                     <input type="date" class="form-control" id="dateInput" name="date" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="orderType" class="form-label">訂單形式</label>
+                    <select class="form-control" id="orderType" name="orderType">
+                      <option value="自取">自取</option>
+                      <option value="外送">外送</option>
+                      <option value="冷凍宅配">冷凍宅配</option>
+                      <option value="7-11冷凍店到店">7-11冷凍店到店</option>
+                      <option value="全家冷凍店到店">全家冷凍店到店</option>
+                    </select>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="deliveryDate" class="form-label">外送日期</label>
@@ -175,31 +193,30 @@
                     <input type="text" class="form-control" id="deliveryTime" name="deliveryTime" placeholder="例如：15:30" />
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="storeName" class="form-label">外送地點名稱</label>
-                    <input type="text" class="form-control" id="storeName" name="storeName" placeholder="例如：林酒店" />
+                    <label for="validDays" class="form-label">報價單有效天數</label>
+                    <select class="form-control" id="validDays" name="validDays">
+                      <option value="7">7天</option>
+                      <option value="14">14天</option>
+                      <option value="30">30天</option>
+                      <option value="60">60天</option>
+                      <option value="90">90天</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="deliveryStoreName" class="form-label">外送地點名稱</label>
+                    <input type="text" class="form-control" id="deliveryStoreName" name="deliveryStoreName" placeholder="例如：林酒店" />
                   </div>
                   <div class="col-md-12 mb-3">
-                    <label for="deliveryAddress" class="form-label">外送地址</label>
-                    <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" placeholder="例如：台中市西屯區朝富路99號" />
+                    <label for="contactAddresss" class="form-label">外送地址</label>
+                    <input type="text" class="form-control" id="contactAddresss" name="contactAddresss" placeholder="例如：台中市西屯區朝富路99號" />
                   </div>
                   <div class="col-md-12 mb-3">
                     <label for="remarks" class="form-label">備註</label>
                     <textarea class="form-control" id="remarks" name="remarks" rows="5">(1)、外送時間:{{deliveryDate}}({{deliveryDay}}){{deliveryTime}}
-(2)、外送地址:{{deliveryAddress}}
-　　　　　　　({{storeName}})
+(2)、外送地址:{{contactAddresss}} - ({{deliveryStoreName}})
 (3)、四雨防油紙袋單顆包裝
-(4)、訂金為總金額50%，於出貨日三天前付款</textarea>
-                    <div class="mt-2 small text-muted">
-                      <p class="mb-1">變數說明：</p>
-                      <ul class="ps-3 mb-1">
-                        <li>{{deliveryDate}} - 外送日期</li>
-                        <li>{{deliveryDay}} - 外送星期</li>
-                        <li>{{deliveryTime}} - 外送時間</li>
-                        <li>{{deliveryAddress}} - 外送地址</li>
-                        <li>{{storeName}} - 外送地點名稱</li>
-                      </ul>
-                      <p class="mb-0">這些變數會在生成報價單時自動替換為您填寫的相應資料。您也可以直接編輯備註內容。</p>
-                    </div>
+(4)、訂金為總金額50%，於出貨日三天前付款
+(5)、本報價單限報價日期起{{validDays}}天內有效</textarea>
                   </div>
                 </div>
               </div>
@@ -636,8 +653,9 @@
       const deliveryDate = $("#deliveryDate").val() || '';
       const deliveryDay = $("#deliveryDay").val() || '';
       const deliveryTime = $("#deliveryTime").val() || '';
-      const deliveryAddress = $("#deliveryAddress").val() || '';
-      const storeName = $("#storeName").val() || '';
+      const contactAddresss = $("#contactAddresss").val() || '';
+      const deliveryStoreName = $("#deliveryStoreName").val() || '';
+      const validDays = $("#validDays").val() || '7';
       
       // 檢查備註是否為默認格式，如果用戶已修改則不覆蓋
       const currentRemarks = $("#remarks").val();
@@ -649,9 +667,10 @@
       // 只有在首次加載或備註為默認格式時才更新
       if (isDefaultFormat || currentRemarks.trim() === '') {
         let remarksText = `(1)、外送時間:${deliveryDate}(${deliveryDay})${deliveryTime}
-(2)、外送地址:${deliveryAddress}(${storeName})
+(2)、外送地址:${contactAddresss}(${deliveryStoreName})
 (3)、四雨防油紙袋單顆包裝
-(4)、訂金為總金額50%，於出貨日三天前付款`;
+(4)、訂金為總金額50%，於出貨日三天前付款
+(5)、本報價單限報價日期起${validDays}天內有效`;
         
         $("#remarks").val(remarksText);
       }
@@ -669,107 +688,240 @@
       }
     }
 
-    $(document).ready(function() {
-      // 預設日期
-      setDefaultDates();
-      
-      // 設置外送日期為今天並更新星期幾
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
-      const dd = String(today.getDate()).padStart(2, "0");
-      const todayStr = `${yyyy}-${mm}-${dd}`;
-      $("#deliveryDate").val(todayStr);
-      updateDeliveryDay();
+    function getDefaultFakeData() {
+      return {
+        logoUrl: "https://ugc.production.linktr.ee/T2LwXZuRACGuwBNY6jQP_ClMq2eT4AEv08bkc",
+        providerName: "小牛甕烤餅",
+        providerPhone: "0908809853",
+        providerAddress: "台中市西區自治街153號一樓",
+        providerStaffName: "劉懿萱",
+        customerName: "測試客戶",
+        customerTaxId: "12345678",
+        customerAddress: "台中市西屯區台灣大道100號",
+        customerPhone: "0912345678",
+        contactPhone: "0987654321",
+        contactName: "王小明",
+        contactGender: "先生",
+        contactAddresss: "台中市西屯區台灣大道9527號",
+        deliveryTime: "15:30",
+        deliveryStoreName: "測試大樓",
+        taxPercent: "0"
+      };
+    }
 
-      // 報價單編號沒填就自動產生一個
-      if (!$("#quoteNumber").val()) {
-        $("#quoteNumber").val(generateQuoteNumber());
+    async function autofillForm() {
+      const data = getDefaultFakeData();
+
+      // 先填入基本資料
+      $("#logoUrl").val(data.logoUrl);
+      $("#providerName").val(data.providerName);
+      $("#providerPhone").val(data.providerPhone);
+      $("#providerAddress").val(data.providerAddress);
+      $("#providerStaffName").val(data.providerStaffName);
+      $("#customerName").val(data.customerName);
+      $("#customerTaxId").val(data.customerTaxId);
+      $("#customerAddress").val(data.customerAddress);
+      $("#customerPhone").val(data.customerPhone);
+      $("#contactPhone").val(data.contactPhone);
+      $("#contactName").val(data.contactName);
+      $("#contactGender").val(data.contactGender);
+      $("#deliveryTime").val(data.deliveryTime);
+      $("#deliveryStoreName").val(data.deliveryStoreName);
+      $("#contactAddresss").val(data.contactAddresss);
+      $("#taxPercent").val(data.taxPercent);
+      $("#orderType").val("外送");
+
+      // 清空現有項目
+      $("#itemsTable tbody").empty();
+
+      // 定義所有口味
+      const flavors = [
+        "蔥油蘿蔔",
+        "香椿蘿蔔",
+        "黃金糖",
+        "紅豆泥",
+        "芝麻",
+        "綠豆沙",
+        "芋頭"
+      ];
+
+      // 使用 Promise 來確保每個項目都正確添加
+      const addItem = (type, index) => {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            if (type === 'bakery') {
+              addBakeryItem();
+            } else if (type === 'drink') {
+              addDrinkItem();
+            } else if (type === 'other') {
+              addOtherItem();
+            }
+            resolve();
+          }, 100); // 每個項目添加間隔 100ms
+        });
+      };
+
+      // 依序添加烤餅項目
+      for (let i = 0; i < flavors.length; i++) {
+        await addItem('bakery', i);
       }
 
-      // 一開始先新增一筆烤餅項目
-      addBakeryItem();
+      // 添加豆漿項目
+      await addItem('drink');
 
-      // 1) 手動更新「稅金百分比」時立即計算
+      // 添加運送費
+      await addItem('other');
+
+      // 等待所有項目添加完成後再設置值
+      setTimeout(() => {
+        const $rows = $("#itemsTable tbody tr");
+        
+        // 設置烤餅項目
+        flavors.forEach((flavor, index) => {
+          const descRow = $rows[index * 2];
+          const numRow = $rows[index * 2 + 1];
+          
+          // 確保選擇"現烤烤餅"選項
+          $(descRow).find('input[name^="itemType_"][value="現烤烤餅"]').prop('checked', true);
+          $(descRow).find('select[name="itemName"]').val(flavor);
+          $(numRow).find('input[name="itemQuantity"]').val("20");
+          $(numRow).find('input[name="itemUnitPrice"]').val("30");
+        });
+
+        // 設置豆漿項目
+        const drinkDescRow = $rows[flavors.length * 2];
+        const drinkNumRow = $rows[flavors.length * 2 + 1];
+        
+        $(drinkDescRow).find('input[name="itemName"]').val("豆漿");
+        $(drinkDescRow).find('textarea[name="itemDescription"]').val("微糖去冰");
+        $(drinkNumRow).find('input[name="itemQuantity"]').val("30");
+        $(drinkNumRow).find('input[name="itemUnitPrice"]').val("25");
+
+        // 設置運送費
+        const lastDescRow = $rows[$rows.length - 2];
+        const lastNumRow = $rows[$rows.length - 1];
+        
+        $(lastDescRow).find('input[name="itemName"]').val("運送費");
+        $(lastNumRow).find('input[name="itemQuantity"]').val("1");
+        $(lastNumRow).find('input[name="itemUnitPrice"]').val("500");
+
+        updateDeliveryDay();
+        updateRemarks();
+        updateTotals();
+      }, 500); // 等待所有項目添加完成後再設置值
+    }
+
+    // 表單提交前檢查
+    function validateForm() {
+      // 檢查是否有項目
+      if ($("#itemsTable tbody tr").length === 0) {
+        alert("請至少添加一個品項");
+        return false;
+      }
+      
+      // 檢查項目數量是否過多，如果過多則提示用戶
+      const itemCount = $("input[name='itemQuantity']").length;
+      if (itemCount > 50) {
+        const confirmSubmit = confirm(`您目前有 ${itemCount} 個項目，數量較多可能導致報價單顯示不完整。是否繼續提交？`);
+        if (!confirmSubmit) {
+          return false;
+        }
+      }
+      
+      return true;
+    }
+
+    $(document).ready(function() {
+      // 設定日期預設值
+      setDefaultDates();
+
+      // 產生報價單編號
+      $("#quoteNumber").val(generateQuoteNumber());
+
+      // 新增烤餅項目按鈕
+      $("#addBakeryButton").click(addBakeryItem);
+
+      // 新增飲料項目按鈕
+      $("#addDrinkButton").click(addDrinkItem);
+
+      // 新增其他項目按鈕
+      $("#addOtherButton").click(addOtherItem);
+
+      // 刷新按鈕
+      $("#refreshButton").click(function() {
+        updateTotals();
+      });
+
+      // 監聽數量和單價輸入框的變化
+      $(document).on("input", "input[name='itemQuantity'], input[name='itemUnitPrice']", updateTotals);
+
+      // 監聽稅金百分比的變化
       $("#taxPercent").on("input", updateTotals);
 
-      // 2) 若稅率失焦點、且值為空 => 0
-      $("#taxPercent").on("blur", handleBlurSetZero);
+      // 監聽數量輸入框的 blur 事件
+      $(document).on("blur", "input[name='itemQuantity']", handleBlurSetOne);
 
-      // 3) 對 #itemsTable 委派監聽 => 當子層的 itemQuantity / itemUnitPrice 在 input 時，立即計算
-      $("#itemsTable").on(
-        "input",
-        'input[name="itemQuantity"], input[name="itemUnitPrice"]',
-        updateTotals
-      );
+      // 監聽單價輸入框的 blur 事件
+      $(document).on("blur", "input[name='itemUnitPrice']", handleBlurSetZero);
 
-      // 4) 若單價失焦點 & 值為空 => 設成 0
-      $("#itemsTable").on(
-        "blur",
-        'input[name="itemUnitPrice"]',
-        handleBlurSetZero
-      );
-
-      // 4) 若數量、單價失焦點 & 值為空 => 設成 0
-      $("#itemsTable").on(
-        "blur",
-        'input[name="itemQuantity"]',
-        handleBlurSetOne
-      );
+      // 監聽刪除按鈕
+      $(document).on("click", ".btn-delete", function() {
+        removeRow(this);
+      });
       
-      // 監聽外送相關欄位的變更，以更新備註（僅在初始狀態下）
-      $("#deliveryDate, #deliveryTime, #deliveryAddress, #storeName").on("change", function() {
-        // 只有當備註為默認格式時才更新
-        const currentRemarks = $("#remarks").val();
-        const isDefaultFormat = currentRemarks.includes('(1)、外送時間:') && 
-                                currentRemarks.includes('(2)、外送地址:') &&
-                                currentRemarks.includes('(3)、四雨防油紙袋單顆包裝') &&
-                                currentRemarks.includes('(4)、訂金為總金額50%');
-        if (isDefaultFormat) {
-          updateRemarks();
-        }
-      });
-
-      // 綁定「新增品項」按鈕
-      $("#addBakeryButton").on("click", addBakeryItem);
-      $("#addDrinkButton").on("click", addDrinkItem);
-      $("#addOtherButton").on("click", addOtherItem);
-
-      // 綁定「刷新」按鈕
-      $("#refreshButton").on("click", function() {
-        updateTotals();
-        alert("已重新計算小計、稅金和總計。");
-      });
-
-      // 監聽表單送出事件
+      // 監聽外送日期變更
+      $("#deliveryDate").on("change", updateDeliveryDay);
+      
+      // 監聽外送時間、地址、店名變更
+      $("#deliveryTime, #contactAddresss, #deliveryStoreName, #validDays").on("change", updateRemarks);
+      
+      // 表單提交前驗證
       $("#quoteForm").on("submit", function(e) {
-        // 送出前再次更新
-        updateTotals();
-
-        // 顯示 confirm
-        const confirmed = confirm(
-          "小計：" +
-          $("#subtotalDisplay").text() +
-          "\n稅金：" +
-          $("#taxDisplay").text() +
-          "\n總計：" +
-          $("#totalDisplay").text() +
-          "\n\n是否確認送出？"
-        );
-        if (!confirmed) {
-          e.preventDefault(); // 使用者按下「取消」，阻止送出
+        if (!validateForm()) {
+          e.preventDefault();
+          return false;
+        }
+        
+        // 在提交前優化大量數據的處理
+        if ($("input[name='itemQuantity']").length > 20) {
+          // 添加一個隱藏字段，標記這是大量數據
+          $("<input>").attr({
+            type: "hidden",
+            name: "hasLargeDataset",
+            value: "true"
+          }).appendTo($("#quoteForm"));
         }
       });
-      
-      // 初始調整UI
+
+      // 調整UI以適應屏幕尺寸
       adjustUIForScreenSize();
+      $(window).resize(adjustUIForScreenSize);
+
+      // 預設添加一個烤餅項目
+      if ($("#itemsTable tbody tr").length === 0) {
+        addBakeryItem();
+      }
       
-      // 窗口大小變化時調整UI
-      $(window).on("resize", adjustUIForScreenSize);
-      
-      // 初始更新備註
-      updateRemarks();
+      // 自動填充測試數據（僅在開發環境使用）
+      if (window.location.hostname === "localhost" || window.location.hostname.includes("127.0.0.1")) {
+        fillTestData();
+      }
     });
+
+    // 填充測試數據
+    function fillTestData() {
+      const testData = getDefaultFakeData();
+      
+      // 填充表單字段
+      for (const key in testData) {
+        if (testData.hasOwnProperty(key)) {
+          $(`#${key}`).val(testData[key]);
+        }
+      }
+      
+      // 更新備註
+      updateRemarks();
+    }
     </script>
   </body>
 </html>
