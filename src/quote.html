@@ -4,13 +4,27 @@
   <head>
     <meta charset="UTF-8">
     <title>報價單</title>
+    <!-- 使用多種 CDN 字體，提供更多選擇 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- 引入思源宋體 (Noto Serif TC) 作為主要字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 引入思源黑體 (Noto Sans TC) 作為備選字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
     /* 設定 A4 列印尺寸 */
     body {
       background-color: #E5E5E5;
-      font-family: 'DFKai-SB', 'BiauKai', '標楷體', sans-serif;
+      /* 使用思源宋體作為主要字體，提供更多備選字體 */
+      font-family: 'Noto Serif TC', serif;
       margin: 0;
       padding: 0;
+    }
+    
+    /* 標題使用思源黑體 */
+    .company-name, .quote-title {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 700;
     }
 
     /* 主容器 */
@@ -336,7 +350,7 @@
 
     /* 項目分頁控制 */
     .items-per-page {
-      max-height: 180mm; /* 控制每頁項目的最大高度 */
+      max-height: 180mm;
       overflow: hidden;
     }
     </style>

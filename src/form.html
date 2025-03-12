@@ -148,10 +148,6 @@
                     <label for="contactPhone" class="form-label">聯絡人電話</label>
                     <input type="text" class="form-control" id="contactPhone" name="contactPhone" placeholder="例如：0912-345678" />
                   </div>
-                  <div class="col-md-12 mb-3">
-                    <label for="contactAddresss" class="form-label">收件地址</label>
-                    <input type="text" class="form-control" id="contactAddresss" name="contactAddresss" placeholder="例如：台北市大同區小明路9號9樓" />
-                  </div>
                 </div>
               </div>
             </div>
@@ -730,6 +726,16 @@
       $("#contactAddresss").val(data.contactAddresss);
       $("#taxPercent").val(data.taxPercent);
       $("#orderType").val("外送");
+      
+      // 設定外送日期為當前日期的一個月後
+      const today = new Date();
+      const oneMonthLater = new Date(today);
+      oneMonthLater.setMonth(today.getMonth() + 1);
+      const yyyy = oneMonthLater.getFullYear();
+      const mm = String(oneMonthLater.getMonth() + 1).padStart(2, "0");
+      const dd = String(oneMonthLater.getDate()).padStart(2, "0");
+      const oneMonthLaterStr = `${yyyy}-${mm}-${dd}`;
+      $("#deliveryDate").val(oneMonthLaterStr);
 
       // 清空現有項目
       $("#itemsTable tbody").empty();
@@ -819,109 +825,68 @@
         return false;
       }
       
-      // 檢查項目數量是否過多，如果過多則提示用戶
-      const itemCount = $("input[name='itemQuantity']").length;
-      if (itemCount > 50) {
-        const confirmSubmit = confirm(`您目前有 ${itemCount} 個項目，數量較多可能導致報價單顯示不完整。是否繼續提交？`);
-        if (!confirmSubmit) {
-          return false;
-        }
-      }
-      
       return true;
     }
 
     $(document).ready(function() {
-      // 設定日期預設值
+      // ===== 1. 初始化設定 =====
+      // 設定日期和報價單編號
       setDefaultDates();
-
-      // 產生報價單編號
       $("#quoteNumber").val(generateQuoteNumber());
-
-      // 新增烤餅項目按鈕
+      
+      // ===== 2. 按鈕事件綁定 =====
+      // 品項按鈕
       $("#addBakeryButton").click(addBakeryItem);
-
-      // 新增飲料項目按鈕
       $("#addDrinkButton").click(addDrinkItem);
-
-      // 新增其他項目按鈕
       $("#addOtherButton").click(addOtherItem);
-
-      // 刷新按鈕
-      $("#refreshButton").click(function() {
-        updateTotals();
-      });
-
-      // 監聽數量和單價輸入框的變化
-      $(document).on("input", "input[name='itemQuantity'], input[name='itemUnitPrice']", updateTotals);
-
-      // 監聽稅金百分比的變化
-      $("#taxPercent").on("input", updateTotals);
-
-      // 監聽數量輸入框的 blur 事件
-      $(document).on("blur", "input[name='itemQuantity']", handleBlurSetOne);
-
-      // 監聽單價輸入框的 blur 事件
-      $(document).on("blur", "input[name='itemUnitPrice']", handleBlurSetZero);
-
-      // 監聽刪除按鈕
-      $(document).on("click", ".btn-delete", function() {
-        removeRow(this);
-      });
+      $("#refreshButton").click(updateTotals);
       
-      // 監聽外送日期變更
+      // ===== 3. 事件監聽 =====
+      // 數量和價格相關
+      $(document)
+        .on("input", "input[name='itemQuantity'], input[name='itemUnitPrice'], #taxPercent", updateTotals)
+        .on("blur", "input[name='itemQuantity']", handleBlurSetOne)
+        .on("blur", "input[name='itemUnitPrice']", handleBlurSetZero)
+        .on("click", ".btn-delete", function() { removeRow(this); });
+      
+      // 外送相關
       $("#deliveryDate").on("change", updateDeliveryDay);
-      
-      // 監聽外送時間、地址、店名變更
       $("#deliveryTime, #contactAddresss, #deliveryStoreName, #validDays").on("change", updateRemarks);
       
-      // 表單提交前驗證
+      // 表單提交
       $("#quoteForm").on("submit", function(e) {
         if (!validateForm()) {
           e.preventDefault();
           return false;
         }
         
-        // 在提交前優化大量數據的處理
+        // 大量數據處理
         if ($("input[name='itemQuantity']").length > 20) {
-          // 添加一個隱藏字段，標記這是大量數據
-          $("<input>").attr({
-            type: "hidden",
-            name: "hasLargeDataset",
-            value: "true"
-          }).appendTo($("#quoteForm"));
+          $("<input>")
+            .attr({
+              type: "hidden",
+              name: "hasLargeDataset",
+              value: "true"
+            })
+            .appendTo($(this));
         }
       });
-
-      // 調整UI以適應屏幕尺寸
+      
+      // ===== 4. 頁面初始化 =====
+      // UI 調整
       adjustUIForScreenSize();
       $(window).resize(adjustUIForScreenSize);
-
-      // 預設添加一個烤餅項目
+      
+      // 預設添加項目
       if ($("#itemsTable tbody tr").length === 0) {
         addBakeryItem();
       }
       
-      // 自動填充測試數據（僅在開發環境使用）
+      // 開發環境自動填充
       if (window.location.hostname === "localhost" || window.location.hostname.includes("127.0.0.1")) {
-        fillTestData();
+        autofillForm();
       }
     });
-
-    // 填充測試數據
-    function fillTestData() {
-      const testData = getDefaultFakeData();
-      
-      // 填充表單字段
-      for (const key in testData) {
-        if (testData.hasOwnProperty(key)) {
-          $(`#${key}`).val(testData[key]);
-        }
-      }
-      
-      // 更新備註
-      updateRemarks();
-    }
     </script>
   </body>
 </html>
