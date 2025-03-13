@@ -338,7 +338,7 @@
           <input
             type="number"
             class="form-control"
-            name="itemQuantity"
+            name="item_{{item_id}}_quantity"
             step="1"
             min="1"
             value="{{defaultQty}}"
@@ -350,7 +350,7 @@
           <input
             type="number"
             class="form-control"
-            name="itemUnitPrice"
+            name="item_{{item_id}}_price"
             step="1"
             min="0"
             value="{{defaultPrice}}"
@@ -433,8 +433,8 @@
       // 取出模板裡的 HTML 字串
       let templateHtml = $("#itemTemplate").html();
       
-      // 生成唯一索引 - 使用時間戳加計數器確保唯一性
-      const index = Date.now() + '_' + (itemIndexCounter++);
+      // 生成唯一索引 - 只使用時間戳
+      const item_id = Date.now();
       
       // 根據類型設定不同的內容
       let typeContent = '';
@@ -446,12 +446,12 @@
         case 'bakery':
           typeContent = `<div class="d-flex flex-wrap">
             <div class="form-check me-3 mb-2">
-              <input class="form-check-input" type="radio" name="itemType_${index}" value="現烤烤餅" id="itemType_${index}_1" checked>
-              <label class="form-check-label" for="itemType_${index}_1">現烤烤餅</label>
+              <input class="form-check-input" type="radio" name="item_${item_id}_type" value="現烤烤餅" id="itemType_${item_id}_1" checked>
+              <label class="form-check-label" for="itemType_${item_id}_1">現烤烤餅</label>
             </div>
             <div class="form-check me-3 mb-2">
-              <input class="form-check-input" type="radio" name="itemType_${index}" value="冷凍烤餅" id="itemType_${index}_2">
-              <label class="form-check-label" for="itemType_${index}_2">冷凍烤餅</label>
+              <input class="form-check-input" type="radio" name="item_${item_id}_type" value="冷凍烤餅" id="itemType_${item_id}_2">
+              <label class="form-check-label" for="itemType_${item_id}_2">冷凍烤餅</label>
             </div>
           </div>`;
           
@@ -460,14 +460,14 @@
             `<option value="${item.value}" data-price="${item.price}">${item.label}</option>`
           ).join('');
           
-          nameContent = `<select class="form-select" name="itemName" onchange="updateBakeryPrice(this)">
+          nameContent = `<select class="form-select" name="item_${item_id}_name" onchange="updateBakeryPrice(this)">
             ${bakeryOptions}
           </select>`;
           defaultPrice = MENU_CONFIG.bakery[0].price.toString(); // 預設為第一個烤餅的價格
           break;
           
         case 'drink':
-          typeContent = `<input type="hidden" name="itemType_${index}" value="飲料">
+          typeContent = `<input type="hidden" name="item_${item_id}_type" value="飲料">
             <div class="form-control">飲料</div>`;
           
           // 從菜單配置生成飲料選項
@@ -488,29 +488,29 @@
           nameContent = `
             <div class="row">
               <div class="col-12 mb-2">
-                <select class="form-select" name="itemName" onchange="updateDrinkPrice(this)">
+                <select class="form-select" name="item_${item_id}_name" onchange="updateDrinkPrice(this)">
                   ${drinkOptions}
                 </select>
               </div>
               <div class="col-6">
-                <select class="form-select form-select-sm" name="itemSweetness_${index}">
+                <select class="form-select form-select-sm" name="item_${item_id}_sweetness">
                   <option value="">-- 甜度 --</option>
                   ${sweetnessOptions}
                 </select>
               </div>
               <div class="col-6">
-                <select class="form-select form-select-sm" name="itemTemperature_${index}">
+                <select class="form-select form-select-sm" name="item_${item_id}_temperature">
                   <option value="">-- 溫度 --</option>
                   ${temperatureOptions}
                 </select>
               </div>
             </div>
-            <textarea class="form-control mt-2" name="itemDescription" placeholder="請輸入其他備註" rows="1"></textarea>`;
+            <textarea class="form-control mt-2" name="item_${item_id}_description" placeholder="請輸入其他備註" rows="1"></textarea>`;
           defaultPrice = MENU_CONFIG.drink[0].price.toString(); // 預設為第一個飲料的價格（豆漿）
           break;
           
         case 'other':
-          typeContent = `<input type="hidden" name="itemType_${index}" value="其他">
+          typeContent = `<input type="hidden" name="item_${item_id}_type" value="其他">
             <div class="form-control">其他</div>`;
           
           // 從菜單配置生成選項
@@ -518,10 +518,10 @@
             `<option value="${item.value}">${item.label}</option>`
           ).join('');
           
-          nameContent = `<select class="form-select" name="itemName">
+          nameContent = `<select class="form-select" name="item_${item_id}_name">
             ${otherOptions}
           </select>
-            <textarea class="form-control mt-2" name="itemDescription" placeholder="請輸入描述" rows="1"></textarea>`;
+            <textarea class="form-control mt-2" name="item_${item_id}_description" placeholder="請輸入描述" rows="1"></textarea>`;
           break;
       }
       
@@ -530,13 +530,17 @@
         .replace(/{{typeContent}}/g, typeContent)
         .replace(/{{nameContent}}/g, nameContent)
         .replace(/{{defaultQty}}/g, defaultQty)
-        .replace(/{{defaultPrice}}/g, defaultPrice);
+        .replace(/{{defaultPrice}}/g, defaultPrice)
+        .replace(/{{item_id}}/g, item_id);
       
       // 加到表格 <tbody>
       $("#itemsTable tbody").append(templateHtml);
       
       // 新增完後即刻重新計算
       updateTotals();
+      
+      // 返回生成的項目ID，方便其他函數使用
+      return item_id;
     }
 
     // 刪除品項（包含描述那一行 + 數值那一行）
@@ -561,11 +565,22 @@
     function updateTotals() {
       let subtotal = 0;
 
-      $("input[name='itemQuantity']").each(function(index) {
+      // 找到所有數量輸入框
+      $("input[name$='_quantity']").each(function() {
         const qty = parseInt($(this).val()) || 0;
-        const price =
-          parseInt($("input[name='itemUnitPrice']").eq(index).val()) || 0;
-        subtotal += qty * price;
+        // 從名稱中提取 ID
+        const name = $(this).attr('name');
+        const idMatch = name.match(/item_(\d+)_quantity/);
+        
+        if (idMatch && idMatch[1]) {
+          const itemId = idMatch[1];
+          // 找到對應的價格輸入框
+          const priceInput = $(`input[name="item_${itemId}_price"]`);
+          if (priceInput.length) {
+            const price = parseInt(priceInput.val()) || 0;
+            subtotal += qty * price;
+          }
+        }
       });
 
       const taxPercent = parseInt($("#taxPercent").val()) || 0;
@@ -737,36 +752,34 @@
         const numRow = $rows[index * 2 + 1];
         
         // 確保選擇"現烤烤餅"選項
-        $(descRow).find('input[name^="itemType_"]:checked').prop('checked', true);
-        $(descRow).find('select[name="itemName"]').val(flavor);
-        $(numRow).find('input[name="itemQuantity"]').val("20");
+        $(descRow).find('input[type="radio"][value="現烤烤餅"]').prop('checked', true);
+        $(descRow).find('select[name$="_name"]').val(flavor);
+        $(numRow).find('input[name$="_quantity"]').val("20");
         
         // 根據選擇的烤餅口味設定價格
         const selectedFlavor = flavor;
         const bakeryItem = MENU_CONFIG.bakery.find(item => item.value === selectedFlavor);
         const bakeryPrice = bakeryItem ? bakeryItem.price.toString() : "30";
-        $(numRow).find('input[name="itemUnitPrice"]').val(bakeryPrice);
+        $(numRow).find('input[name$="_price"]').val(bakeryPrice);
       });
 
       // 設置飲料項目
       const drinkIndex = flavors.length * 2;
       const selectedDrink = MENU_CONFIG.drink[0].value; // 預設選第一個飲料
-      $($rows[drinkIndex]).find('select[name="itemName"]').val(selectedDrink);
-      $($rows[drinkIndex]).find('select[name^="itemSweetness_"]').val(MENU_CONFIG.drinkCustomize.sweetness[1].value); // 預設微糖
-      $($rows[drinkIndex]).find('select[name^="itemTemperature_"]').val(MENU_CONFIG.drinkCustomize.temperature[0].value); // 預設冰
-      $($rows[drinkIndex]).find('textarea').val("");
-      $($rows[drinkIndex + 1]).find('input[name="itemQuantity"]').val("30");
+      $($rows[drinkIndex]).find('select[name$="_name"]').val(selectedDrink);
+      $($rows[drinkIndex]).find('select[name$="_sweetness"]').val(MENU_CONFIG.drinkCustomize.sweetness[1].value); // 預設微糖
+      $($rows[drinkIndex + 1]).find('input[name$="_quantity"]').val("30");
       
       // 根據選擇的飲料設定價格
       const drinkItem = MENU_CONFIG.drink.find(item => item.value === selectedDrink);
       const drinkPrice = drinkItem ? drinkItem.price.toString() : "15";
-      $($rows[drinkIndex + 1]).find('input[name="itemUnitPrice"]').val(drinkPrice);
+      $($rows[drinkIndex + 1]).find('input[name$="_price"]').val(drinkPrice);
 
       // 設置運送費
       const lastIndex = $rows.length - 2;
-      $($rows[lastIndex]).find('select[name="itemName"]').val("運費");
-      $($rows[lastIndex + 1]).find('input[name="itemQuantity"]').val("1");
-      $($rows[lastIndex + 1]).find('input[name="itemUnitPrice"]').val("500");
+      $($rows[lastIndex]).find('select[name$="_name"]').val("運費");
+      $($rows[lastIndex + 1]).find('input[name$="_quantity"]').val("1");
+      $($rows[lastIndex + 1]).find('input[name$="_price"]').val("500");
 
       updateDeliveryDay();
       updateRemarks();
@@ -800,9 +813,9 @@
       // ===== 3. 事件監聽 =====
       // 使用事件委託處理數量和價格變更
       $(document)
-        .on("input", "input[name='itemQuantity'], input[name='itemUnitPrice'], #taxPercent", updateTotals)
-        .on("blur", "input[name='itemQuantity']", handleBlurSetOne)
-        .on("blur", "input[name='itemUnitPrice']", handleBlurSetZero)
+        .on("input", "input[name$='_quantity'], input[name$='_price'], #taxPercent", updateTotals)
+        .on("blur", "input[name$='_quantity']", handleBlurSetOne)
+        .on("blur", "input[name$='_price']", handleBlurSetZero)
         .on("click", ".btn-danger", function() { removeRow(this); });
       
       // 外送相關 - 合併事件處理
@@ -823,7 +836,7 @@
         }
         
         // 大量數據處理
-        if ($("input[name='itemQuantity']").length > 20) {
+        if ($("input[name='item_quantity']").length > 20) {
           $("<input>")
             .attr({
               type: "hidden",
@@ -911,68 +924,65 @@
       // 添加品項數據
       formData.items = [];
       
-      // 取得所有品項資料
-      $("#itemsTable tbody tr.descRow").each(function(index) {
-        const $descRow = $(this);
-        const $numberRow = $descRow.next(".numberRow");
+      // 創建一個 Map 來存儲按 ID 分組的項目數據
+      const itemsMap = new Map();
+      
+      // 找到所有項目相關的輸入欄位
+      $("[name^='item_']").each(function() {
+        const name = $(this).attr('name');
+        const value = $(this).val();
         
-        // 獲取項目類型
-        let type = '';
-        const typeRadio = $descRow.find('input[name^="itemType_"]:checked');
-        const typeHidden = $descRow.find('input[name^="itemType_"][type="hidden"]');
-        
-        if (typeRadio.length) {
-          type = typeRadio.val();
-        } else if (typeHidden.length) {
-          type = typeHidden.val();
-        } else {
-          // 嘗試從其他元素獲取類型
-          const typeDisplayInput = $descRow.find('input[name$="_display"]');
-          if (typeDisplayInput.length) {
-            type = typeDisplayInput.val();
-          }
-        }
-        
-        // 獲取項目名稱
-        let name = '';
-        const nameSelect = $descRow.find('select[name="itemName"]');
-        
-        if (nameSelect.length) {
-          name = nameSelect.val() || '';
-        }
-        
-        // 獲取飲料客製化選項
-        let customOptions = {};
-        if (type === '飲料') {
-          // 獲取甜度
-          const sweetnessSelect = $descRow.find('select[name^="itemSweetness_"]');
-          if (sweetnessSelect.length) {
-            customOptions.sweetness = sweetnessSelect.val() || '';
+        // 解析欄位名稱：item_ID_fieldname
+        const parts = name.split('_');
+        if (parts.length >= 3) {
+          // 提取 ID 和欄位名稱
+          const id = parts[1]; // 第二部分是 ID
+          const fieldName = parts.slice(2).join('_'); // 第三部分及之後是欄位名稱
+          
+          // 確保該 ID 在 Map 中有一個對象
+          if (!itemsMap.has(id)) {
+            itemsMap.set(id, {});
           }
           
-          // 獲取溫度
-          const temperatureSelect = $descRow.find('select[name^="itemTemperature_"]');
-          if (temperatureSelect.length) {
-            customOptions.temperature = temperatureSelect.val() || '';
-          }
+          // 將值存儲到對應的對象中
+          itemsMap.get(id)[fieldName] = value;
         }
+      });
+      
+      // 將 Map 轉換為數組並添加到 formData.items
+      for (const [id, item] of itemsMap) {
+        // 獲取項目類型
+        let type = item.type || '現烤烤餅';
+        
+        // 獲取項目名稱
+        let name = item.name || '';
         
         // 獲取項目描述
-        const desc = $descRow.find('textarea[name="itemDescription"]').val() || '';
+        let desc = item.description || '';
         
         // 獲取數量和價格
-        const qty = parseInt($numberRow.find('input[name="itemQuantity"]').val(), 10) || 0;
-        const price = parseInt($numberRow.find('input[name="itemUnitPrice"]').val(), 10) || 0;
-
-        formData.items.push({ 
+        const qty = parseInt(item.quantity, 10) || 0;
+        const price = parseInt(item.price, 10) || 0;
+        
+        // 創建項目對象
+        const itemObj = { 
           type,
           name, 
           desc, 
           qty, 
-          price,
-          customOptions
-        });
-      });
+          price
+        };
+        
+        // 如果是飲料，添加客製化選項
+        if (type === '飲料') {
+          itemObj.customOptions = {
+            sweetness: item.sweetness || '',
+            temperature: item.temperature || ''
+          };
+        }
+        
+        formData.items.push(itemObj);
+      }
 
       // 顯示 JSON
       $("#exportedJson").val(JSON.stringify(formData, null, 2));
@@ -1037,7 +1047,7 @@
             }
             
             // 添加項目 - 直接調用 addItem 函數，它會自動生成唯一索引
-            addItem(itemType);
+            const item_id = addItem(itemType);
             
             // 獲取剛添加的項目行
             const $descRow = $("#itemsTable tbody tr.descRow").last();
@@ -1047,19 +1057,19 @@
             if (itemType === 'bakery') {
               // 根據 item.type 選擇正確的單選按鈕
               if (item.type === '冷凍烤餅') {
-                $descRow.find('input[name^="itemType_"][value="冷凍烤餅"]').prop('checked', true);
+                $descRow.find(`input[name="item_${item_id}_type"][value="冷凍烤餅"]`).prop('checked', true);
               } else {
-                $descRow.find('input[name^="itemType_"][value="現烤烤餅"]').prop('checked', true);
+                $descRow.find(`input[name="item_${item_id}_type"][value="現烤烤餅"]`).prop('checked', true);
               }
             } else {
-              const typeInput = $descRow.find('input[name^="itemType_"]');
+              const typeInput = $descRow.find(`input[name="item_${item_id}_type"]`);
               if (typeInput.length) {
                 typeInput.val(item.type || (itemType === 'drink' ? '飲料' : '其他'));
               }
             }
             
             // 設置項目名稱
-            const nameSelect = $descRow.find('select[name="itemName"]');
+            const nameSelect = $descRow.find(`select[name="item_${item_id}_name"]`);
             
             if (nameSelect.length && item.name) {
               // 檢查選項是否存在
@@ -1076,7 +1086,7 @@
             if (itemType === 'drink' && item.customOptions) {
               // 設置甜度
               if (item.customOptions.sweetness) {
-                const sweetnessSelect = $descRow.find('select[name^="itemSweetness_"]');
+                const sweetnessSelect = $descRow.find(`select[name="item_${item_id}_sweetness"]`);
                 if (sweetnessSelect.length) {
                   if (sweetnessSelect.find(`option[value="${item.customOptions.sweetness}"]`).length) {
                     sweetnessSelect.val(item.customOptions.sweetness);
@@ -1089,7 +1099,7 @@
               
               // 設置溫度
               if (item.customOptions.temperature) {
-                const temperatureSelect = $descRow.find('select[name^="itemTemperature_"]');
+                const temperatureSelect = $descRow.find(`select[name="item_${item_id}_temperature"]`);
                 if (temperatureSelect.length) {
                   if (temperatureSelect.find(`option[value="${item.customOptions.temperature}"]`).length) {
                     temperatureSelect.val(item.customOptions.temperature);
@@ -1102,14 +1112,14 @@
             }
             
             // 設置項目描述
-            const descTextarea = $descRow.find('textarea[name="itemDescription"]');
+            const descTextarea = $descRow.find(`textarea[name="item_${item_id}_description"]`);
             if (descTextarea.length && item.desc) {
               descTextarea.val(item.desc);
             }
             
             // 設置數量和價格
-            $numberRow.find('input[name="itemQuantity"]').val(item.qty || 0);
-            $numberRow.find('input[name="itemUnitPrice"]').val(item.price || 0);
+            $numberRow.find(`input[name="item_${item_id}_quantity"]`).val(item.qty || 0);
+            $numberRow.find(`input[name="item_${item_id}_price"]`).val(item.price || 0);
           });
         }
 
@@ -1147,12 +1157,20 @@
     // 根據選擇的烤餅口味更新價格
     function updateBakeryPrice(selectElement) {
       const selectedFlavor = $(selectElement).val();
-      const priceInput = $(selectElement).closest('tr').next().find('input[name="itemUnitPrice"]');
+      // 從名稱中提取 ID
+      const name = $(selectElement).attr('name');
+      const idMatch = name.match(/item_(\d+)_name/);
       
-      // 從 MENU_CONFIG 中查找選擇的烤餅口味價格
-      const bakeryItem = MENU_CONFIG.bakery.find(item => item.value === selectedFlavor);
-      if (bakeryItem) {
-        priceInput.val(bakeryItem.price);
+      if (idMatch && idMatch[1]) {
+        const itemId = idMatch[1];
+        // 找到對應的價格輸入框
+        const priceInput = $(`input[name="item_${itemId}_price"]`);
+        
+        // 從 MENU_CONFIG 中查找選擇的烤餅口味價格
+        const bakeryItem = MENU_CONFIG.bakery.find(item => item.value === selectedFlavor);
+        if (bakeryItem && priceInput.length) {
+          priceInput.val(bakeryItem.price);
+        }
       }
       
       // 更新總計
@@ -1162,12 +1180,20 @@
     // 根據選擇的飲料類型更新價格
     function updateDrinkPrice(selectElement) {
       const selectedDrink = $(selectElement).val();
-      const priceInput = $(selectElement).closest('tr').next().find('input[name="itemUnitPrice"]');
+      // 從名稱中提取 ID
+      const name = $(selectElement).attr('name');
+      const idMatch = name.match(/item_(\d+)_name/);
       
-      // 從 MENU_CONFIG 中查找選擇的飲料價格
-      const drinkItem = MENU_CONFIG.drink.find(item => item.value === selectedDrink);
-      if (drinkItem) {
-        priceInput.val(drinkItem.price);
+      if (idMatch && idMatch[1]) {
+        const itemId = idMatch[1];
+        // 找到對應的價格輸入框
+        const priceInput = $(`input[name="item_${itemId}_price"]`);
+        
+        // 從 MENU_CONFIG 中查找選擇的飲料價格
+        const drinkItem = MENU_CONFIG.drink.find(item => item.value === selectedDrink);
+        if (drinkItem && priceInput.length) {
+          priceInput.val(drinkItem.price);
+        }
       }
       
       // 更新總計

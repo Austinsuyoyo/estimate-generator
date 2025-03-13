@@ -159,41 +159,66 @@ async function processFormData(formData) {
 
 // 處理項目數據
 function processItemsData(formData) {
-	// 取得所有品項資料
-	const itemDescriptions = formData.getAll("itemDescription");
-	const itemQuantities = formData.getAll("itemQuantity");
-	const itemUnitPrices = formData.getAll("itemUnitPrice");
-	const itemNames = formData.getAll("itemName") || Array(Math.max(itemDescriptions.length, itemQuantities.length)).fill("");
-
-	// 收集所有 itemType_ 開頭的欄位
-	const itemTypes = [];
+	// 新的處理方式：根據 item_ID_ 前綴分組
+	const itemsMap = new Map(); // 用於存儲按 ID 分組的項目數據
+	
+	// 遍歷所有表單欄位，找出項目相關的欄位並按 ID 分組
 	for (const [key, value] of formData.entries()) {
-		if (key.startsWith('itemType_')) itemTypes.push(value);
+		// 檢查是否是項目相關的欄位
+		if (key.startsWith('item_')) {
+			// 解析欄位名稱：item_ID_fieldname
+			const parts = key.split('_');
+			if (parts.length >= 3) {
+				// 提取 ID 和欄位名稱
+				const id = parts[1]; // 第二部分是 ID
+				const fieldName = parts.slice(2).join('_'); // 第三部分及之後是欄位名稱
+				
+				// 確保該 ID 在 Map 中有一個對象
+				if (!itemsMap.has(id)) {
+					itemsMap.set(id, {});
+				}
+				
+				// 將值存儲到對應的對象中
+				itemsMap.get(id)[fieldName] = value;
+			}
+		}
 	}
-	while (itemTypes.length < itemQuantities.length) itemTypes.push("現烤烤餅");
-
+	
+	// 將 Map 轉換為數組
+	const itemsArray = Array.from(itemsMap.values());
+	
 	// 生成項目 HTML 並計算小計
 	let itemsHtml = "", subtotal = 0;
 	const itemsJson = []; // 用於匯出 JSON
 	
-	for (let i = 0; i < itemQuantities.length; i++) {
-
-		const desc = i < itemDescriptions.length ? itemDescriptions[i] : "";
-		const name = i < itemNames.length ? itemNames[i] : "";
-		const type = i < itemTypes.length ? itemTypes[i] : "現烤烤餅";
-		const qty = Math.floor(parseFloat(itemQuantities[i]) || 0);
-		const price = Math.floor(parseFloat(itemUnitPrices[i]) || 0);
+	// 處理每個項目
+	itemsArray.forEach((item, index) => {
+		const type = item.type || "現烤烤餅";
+		const name = item.name || "";
+		const desc = item.description || "";
+		const qty = Math.floor(parseFloat(item.quantity) || 0);
+		const price = Math.floor(parseFloat(item.price) || 0);
 		const lineTotal = qty * price;
 		subtotal += lineTotal;
 		
 		// 添加到 JSON 數組
-		itemsJson.push({
+		const jsonItem = {
 			type: type,
 			name: name,
 			desc: desc,
 			qty: qty,
 			price: price
-		});
+		};
+		
+		// 如果是飲料，添加客製化選項
+		if (type === '飲料') {
+			jsonItem.customOptions = {
+				sweetness: item.sweetness || '',
+				temperature: item.temperature || ''
+			};
+		}
+		
+		itemsJson.push(jsonItem);
 		
 		// 交換品名和項目的顯示
 		let displayName = type; // 品名顯示為烤餅類型
@@ -201,14 +226,14 @@ function processItemsData(formData) {
 		if (desc && desc.trim() !== "") displayDesc += " - " + desc;
 		
 		itemsHtml += `<tr>
-			<td>${i + 1}</td>
+			<td>${index + 1}</td>
 			<td>${displayName}</td>
 			<td>${displayDesc}</td>
 			<td>${formatNumber(qty)}</td>
 			<td>${formatNumber(price)}</td>
 			<td>${formatNumber(lineTotal)}</td>
 		</tr>`;
-	}
+	});
 	
 	return { itemsHtml, subtotal, itemsJson };
 }
