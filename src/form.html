@@ -365,6 +365,44 @@
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    // 菜單配置 - 集中管理所有菜單項目
+    const MENU_CONFIG = {
+      // 烤餅口味
+      bakery: [
+        { value: "黃金糖", label: "黃金糖", price: 30 },
+        { value: "黑芝麻", label: "黑芝麻", price: 30 },
+        { value: "紅豆泥", label: "紅豆泥", price: 30 },
+        { value: "綠豆沙", label: "綠豆沙", price: 30 },
+        { value: "芋仔泥", label: "芋仔泥", price: 30 },
+        { value: "蔥油蘿蔔", label: "蔥油蘿蔔", price: 30 }
+      ],
+      // 飲料選項
+      drink: [
+        { value: "豆漿", label: "豆漿", price: 15 },
+        { value: "黑芝麻堅果飲", label: "黑芝麻堅果飲", price: 40 }
+      ],
+      // 飲料客製化選項
+      drinkCustomize: {
+        sweetness: [
+          { value: "無糖", label: "無糖" },
+          { value: "微糖", label: "微糖" },
+          { value: "正常糖", label: "正常糖" }
+        ],
+        temperature: [
+          { value: "冰", label: "冰" },
+          { value: "熱", label: "熱" }
+        ]
+      },
+      // 其他項目
+      other: [
+        { value: "其他項目", label: "其他項目" },
+        { value: "服務費", label: "服務費" },
+        { value: "運費", label: "運費" },
+        { value: "包裝費", label: "包裝費" },
+        { value: "折扣", label: "折扣" }
+      ]
+    };
+
     // 設定日期預設值：今天
     function setDefaultDates() {
       const today = new Date();
@@ -417,32 +455,72 @@
             </div>
           </div>`;
           
-          nameContent = `<select class="form-select" name="itemName">
-            <option value="蔥油蘿蔔">蔥油蘿蔔</option>
-            <option value="香椿蘿蔔">香椿蘿蔔</option>
-            <option value="黃金糖">黃金糖</option>
-            <option value="紅豆泥">紅豆泥</option>
-            <option value="芝麻">芝麻</option>
-            <option value="綠豆沙">綠豆沙</option>
-            <option value="芋頭">芋頭</option>
+          // 從菜單配置生成選項
+          let bakeryOptions = MENU_CONFIG.bakery.map(item => 
+            `<option value="${item.value}" data-price="${item.price}">${item.label}</option>`
+          ).join('');
+          
+          nameContent = `<select class="form-select" name="itemName" onchange="updateBakeryPrice(this)">
+            ${bakeryOptions}
           </select>`;
-          defaultPrice = '30';
+          defaultPrice = MENU_CONFIG.bakery[0].price.toString(); // 預設為第一個烤餅的價格
           break;
           
         case 'drink':
           typeContent = `<input type="hidden" name="itemType_${index}" value="飲料">
-            <input type="text" class="form-control" name="itemType_${index}_display" value="飲料" readonly />`;
+            <div class="form-control">飲料</div>`;
           
-          nameContent = `<input type="text" class="form-control" name="itemName" placeholder="請輸入飲料名稱" value="飲料" />
-            <textarea class="form-control mt-2" name="itemDescription" placeholder="請輸入飲料描述" rows="1"></textarea>`;
-          defaultPrice = '25';
+          // 從菜單配置生成飲料選項
+          let drinkOptions = MENU_CONFIG.drink.map(item => 
+            `<option value="${item.value}" data-price="${item.price}">${item.label}</option>`
+          ).join('');
+          
+          // 從菜單配置生成甜度選項
+          let sweetnessOptions = MENU_CONFIG.drinkCustomize.sweetness.map(item => 
+            `<option value="${item.value}">${item.label}</option>`
+          ).join('');
+          
+          // 從菜單配置生成溫度選項
+          let temperatureOptions = MENU_CONFIG.drinkCustomize.temperature.map(item => 
+            `<option value="${item.value}">${item.label}</option>`
+          ).join('');
+          
+          nameContent = `
+            <div class="row">
+              <div class="col-12 mb-2">
+                <select class="form-select" name="itemName" onchange="updateDrinkPrice(this)">
+                  ${drinkOptions}
+                </select>
+              </div>
+              <div class="col-6">
+                <select class="form-select form-select-sm" name="itemSweetness_${index}">
+                  <option value="">-- 甜度 --</option>
+                  ${sweetnessOptions}
+                </select>
+              </div>
+              <div class="col-6">
+                <select class="form-select form-select-sm" name="itemTemperature_${index}">
+                  <option value="">-- 溫度 --</option>
+                  ${temperatureOptions}
+                </select>
+              </div>
+            </div>
+            <textarea class="form-control mt-2" name="itemDescription" placeholder="請輸入其他備註" rows="1"></textarea>`;
+          defaultPrice = MENU_CONFIG.drink[0].price.toString(); // 預設為第一個飲料的價格（豆漿）
           break;
           
         case 'other':
           typeContent = `<input type="hidden" name="itemType_${index}" value="其他">
-            <input type="text" class="form-control" name="itemType_${index}_display" value="其他" readonly />`;
+            <div class="form-control">其他</div>`;
           
-          nameContent = `<input type="text" class="form-control" name="itemName" placeholder="請輸入品名" value="其他項目" />
+          // 從菜單配置生成選項
+          let otherOptions = MENU_CONFIG.other.map(item => 
+            `<option value="${item.value}">${item.label}</option>`
+          ).join('');
+          
+          nameContent = `<select class="form-select" name="itemName">
+            ${otherOptions}
+          </select>
             <textarea class="form-control mt-2" name="itemDescription" placeholder="請輸入描述" rows="1"></textarea>`;
           break;
       }
@@ -617,10 +695,8 @@
       // 清空現有項目
       $("#itemsTable tbody").empty();
 
-      // 定義所有口味
-      const flavors = [
-        "蔥油蘿蔔", "香椿蘿蔔", "黃金糖", "紅豆泥", "芝麻", "綠豆沙", "芋頭"
-      ];
+      // 使用菜單配置中的烤餅口味
+      const flavors = MENU_CONFIG.bakery.map(item => item.value);
 
       // 使用 Promise.all 批量添加項目
       const addItemPromises = [];
@@ -661,22 +737,34 @@
         const numRow = $rows[index * 2 + 1];
         
         // 確保選擇"現烤烤餅"選項
-        $(descRow).find('input[name^="itemType_"][value="現烤烤餅"]').prop('checked', true);
+        $(descRow).find('input[name^="itemType_"]:checked').prop('checked', true);
         $(descRow).find('select[name="itemName"]').val(flavor);
         $(numRow).find('input[name="itemQuantity"]').val("20");
-        $(numRow).find('input[name="itemUnitPrice"]').val("30");
+        
+        // 根據選擇的烤餅口味設定價格
+        const selectedFlavor = flavor;
+        const bakeryItem = MENU_CONFIG.bakery.find(item => item.value === selectedFlavor);
+        const bakeryPrice = bakeryItem ? bakeryItem.price.toString() : "30";
+        $(numRow).find('input[name="itemUnitPrice"]').val(bakeryPrice);
       });
 
       // 設置飲料項目
       const drinkIndex = flavors.length * 2;
-      $($rows[drinkIndex]).find('input[name="itemName"]').val("豆漿");
-      $($rows[drinkIndex]).find('textarea').val("微糖去冰");
+      const selectedDrink = MENU_CONFIG.drink[0].value; // 預設選第一個飲料
+      $($rows[drinkIndex]).find('select[name="itemName"]').val(selectedDrink);
+      $($rows[drinkIndex]).find('select[name^="itemSweetness_"]').val(MENU_CONFIG.drinkCustomize.sweetness[1].value); // 預設微糖
+      $($rows[drinkIndex]).find('select[name^="itemTemperature_"]').val(MENU_CONFIG.drinkCustomize.temperature[0].value); // 預設冰
+      $($rows[drinkIndex]).find('textarea').val("");
       $($rows[drinkIndex + 1]).find('input[name="itemQuantity"]').val("30");
-      $($rows[drinkIndex + 1]).find('input[name="itemUnitPrice"]').val("25");
+      
+      // 根據選擇的飲料設定價格
+      const drinkItem = MENU_CONFIG.drink.find(item => item.value === selectedDrink);
+      const drinkPrice = drinkItem ? drinkItem.price.toString() : "15";
+      $($rows[drinkIndex + 1]).find('input[name="itemUnitPrice"]').val(drinkPrice);
 
       // 設置運送費
       const lastIndex = $rows.length - 2;
-      $($rows[lastIndex]).find('input[name="itemName"]').val("運送費");
+      $($rows[lastIndex]).find('select[name="itemName"]').val("運費");
       $($rows[lastIndex + 1]).find('input[name="itemQuantity"]').val("1");
       $($rows[lastIndex + 1]).find('input[name="itemUnitPrice"]').val("500");
 
@@ -847,13 +935,26 @@
         
         // 獲取項目名稱
         let name = '';
-        const nameInput = $descRow.find('input[name="itemName"]');
         const nameSelect = $descRow.find('select[name="itemName"]');
         
-        if (nameInput.length) {
-          name = nameInput.val() || '';
-        } else if (nameSelect.length) {
+        if (nameSelect.length) {
           name = nameSelect.val() || '';
+        }
+        
+        // 獲取飲料客製化選項
+        let customOptions = {};
+        if (type === '飲料') {
+          // 獲取甜度
+          const sweetnessSelect = $descRow.find('select[name^="itemSweetness_"]');
+          if (sweetnessSelect.length) {
+            customOptions.sweetness = sweetnessSelect.val() || '';
+          }
+          
+          // 獲取溫度
+          const temperatureSelect = $descRow.find('select[name^="itemTemperature_"]');
+          if (temperatureSelect.length) {
+            customOptions.temperature = temperatureSelect.val() || '';
+          }
         }
         
         // 獲取項目描述
@@ -868,7 +969,8 @@
           name, 
           desc, 
           qty, 
-          price 
+          price,
+          customOptions
         });
       });
 
@@ -896,35 +998,14 @@
 
       try {
         const data = JSON.parse(jsonText);
-
-        // 先嘗試通過 API 驗證 JSON 格式
-        fetch(window.location.href, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: jsonText
-        })
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            // 直接使用本地匯入函數處理數據
-            performLocalImport(data);
-          } else {
-            alert("JSON 格式錯誤：" + (result.message || "請確認格式是否正確"));
-          }
-        })
-        .catch(error => {
-          console.error("匯入錯誤:", error);
-          // 如果 API 請求失敗，仍然嘗試本地匯入
-          performLocalImport(data);
-        });
+        // 直接使用本地匯入函數處理數據
+        performLocalImport(data);
       } catch (error) {
         alert("JSON 格式錯誤，請確認格式是否正確");
       }
     }
 
-    // 本地匯入 JSON 數據（當 API 請求失敗時使用）
+    // 本地匯入 JSON 數據
     function performLocalImport(data) {
       try {
         // 從配置中獲取所有欄位並填充數據
@@ -937,7 +1018,7 @@
             $(`#${elementId}`).val(data[jsonKey]);
           }
         });
-
+        
         // 清空品項
         $("#itemsTable tbody").empty();
 
@@ -975,15 +1056,9 @@
               if (typeInput.length) {
                 typeInput.val(item.type || (itemType === 'drink' ? '飲料' : '其他'));
               }
-              
-              const typeDisplayInput = $descRow.find('input[name$="_display"]');
-              if (typeDisplayInput.length) {
-                typeDisplayInput.val(item.type || (itemType === 'drink' ? '飲料' : '其他'));
-              }
             }
             
             // 設置項目名稱
-            const nameInput = $descRow.find('input[name="itemName"]');
             const nameSelect = $descRow.find('select[name="itemName"]');
             
             if (nameSelect.length && item.name) {
@@ -995,8 +1070,35 @@
                 nameSelect.append(new Option(item.name, item.name));
                 nameSelect.val(item.name);
               }
-            } else if (nameInput.length && item.name) {
-              nameInput.val(item.name);
+            }
+            
+            // 設置飲料客製化選項
+            if (itemType === 'drink' && item.customOptions) {
+              // 設置甜度
+              if (item.customOptions.sweetness) {
+                const sweetnessSelect = $descRow.find('select[name^="itemSweetness_"]');
+                if (sweetnessSelect.length) {
+                  if (sweetnessSelect.find(`option[value="${item.customOptions.sweetness}"]`).length) {
+                    sweetnessSelect.val(item.customOptions.sweetness);
+                  } else {
+                    sweetnessSelect.append(new Option(item.customOptions.sweetness, item.customOptions.sweetness));
+                    sweetnessSelect.val(item.customOptions.sweetness);
+                  }
+                }
+              }
+              
+              // 設置溫度
+              if (item.customOptions.temperature) {
+                const temperatureSelect = $descRow.find('select[name^="itemTemperature_"]');
+                if (temperatureSelect.length) {
+                  if (temperatureSelect.find(`option[value="${item.customOptions.temperature}"]`).length) {
+                    temperatureSelect.val(item.customOptions.temperature);
+                  } else {
+                    temperatureSelect.append(new Option(item.customOptions.temperature, item.customOptions.temperature));
+                    temperatureSelect.val(item.customOptions.temperature);
+                  }
+                }
+              }
             }
             
             // 設置項目描述
@@ -1040,6 +1142,36 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }
+
+    // 根據選擇的烤餅口味更新價格
+    function updateBakeryPrice(selectElement) {
+      const selectedFlavor = $(selectElement).val();
+      const priceInput = $(selectElement).closest('tr').next().find('input[name="itemUnitPrice"]');
+      
+      // 從 MENU_CONFIG 中查找選擇的烤餅口味價格
+      const bakeryItem = MENU_CONFIG.bakery.find(item => item.value === selectedFlavor);
+      if (bakeryItem) {
+        priceInput.val(bakeryItem.price);
+      }
+      
+      // 更新總計
+      updateTotals();
+    }
+
+    // 根據選擇的飲料類型更新價格
+    function updateDrinkPrice(selectElement) {
+      const selectedDrink = $(selectElement).val();
+      const priceInput = $(selectElement).closest('tr').next().find('input[name="itemUnitPrice"]');
+      
+      // 從 MENU_CONFIG 中查找選擇的飲料價格
+      const drinkItem = MENU_CONFIG.drink.find(item => item.value === selectedDrink);
+      if (drinkItem) {
+        priceInput.val(drinkItem.price);
+      }
+      
+      // 更新總計
+      updateTotals();
     }
 
     </script>

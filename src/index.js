@@ -38,12 +38,6 @@ export default {
 			if (botCheck.newCookie) response.headers.append("Set-Cookie", botCheck.newCookie);
 			return response;
 		} else if (request.method === "POST") {
-			// 檢查是否為 JSON 匯入請求
-			const contentType = request.headers.get("Content-Type") || "";
-			if (contentType.includes("application/json")) {
-				return handleJsonImport(request, botCheck);
-			}
-
 			// 驗證請求來源
 			const { isValid, errorResponse } = validateRequestSource(request);
 			if (!isValid) return errorResponse;
@@ -62,93 +56,6 @@ export default {
 		}
 	}
 };
-
-// 處理 JSON 匯入請求
-async function handleJsonImport(request, botCheck) {
-	try {
-		// 解析 JSON 數據
-		const jsonData = await request.json();
-		
-		// 驗證 JSON 數據格式
-		if (!validateJsonFormat(jsonData)) {
-			return new Response(JSON.stringify({ 
-				success: false, 
-				message: "無效的 JSON 格式，請確保包含必要欄位" 
-			}), {
-				status: 400,
-				headers: { 
-					"Content-Type": "application/json",
-					"Access-Control-Allow-Origin": "*"
-				}
-			});
-		}
-		
-		// 處理 JSON 數據並返回成功響應
-		const response = new Response(JSON.stringify({ 
-			success: true, 
-			message: "JSON 匯入成功",
-			data: {
-				itemCount: jsonData.items ? jsonData.items.length : 0
-			}
-		}), {
-			headers: { 
-				"Content-Type": "application/json",
-				"Access-Control-Allow-Origin": "*"
-			}
-		});
-		
-		// 添加 cookie 如果有的話
-		if (botCheck.newCookie) {
-			response.headers.append("Set-Cookie", botCheck.newCookie);
-		}
-		
-		return response;
-	} catch (error) {
-		console.error("JSON 匯入錯誤:", error);
-		return new Response(JSON.stringify({ 
-			success: false, 
-			message: "處理 JSON 時發生錯誤: " + error.message 
-		}), {
-			status: 500,
-			headers: { 
-				"Content-Type": "application/json",
-				"Access-Control-Allow-Origin": "*"
-			}
-		});
-	}
-}
-
-// 驗證 JSON 格式
-function validateJsonFormat(jsonData) {
-	// 必要欄位列表
-	const requiredFields = ["providerName", "customerName", "items"];
-	
-	// 檢查必要欄位
-	for (const field of requiredFields) {
-		if (!jsonData[field]) return false;
-	}
-	
-	// 檢查 items 是否為數組且至少有一個項目
-	if (!Array.isArray(jsonData.items) || jsonData.items.length === 0) return false;
-	
-	// 檢查每個項目是否有必要欄位
-	const requiredItemFields = ["type", "name", "qty", "price"];
-	for (const item of jsonData.items) {
-		// 檢查必要欄位
-		for (const field of requiredItemFields) {
-			if (typeof item[field] === "undefined") {
-				return false;
-			}
-		}
-		
-		// 檢查數值欄位是否為數字或可轉換為數字
-		if (isNaN(Number(item.qty)) || isNaN(Number(item.price))) {
-			return false;
-		}
-	}
-	
-	return true;
-}
 
 // 驗證請求來源
 function validateRequestSource(request) {
@@ -270,6 +177,7 @@ function processItemsData(formData) {
 	const itemsJson = []; // 用於匯出 JSON
 	
 	for (let i = 0; i < itemQuantities.length; i++) {
+
 		const desc = i < itemDescriptions.length ? itemDescriptions[i] : "";
 		const name = i < itemNames.length ? itemNames[i] : "";
 		const type = i < itemTypes.length ? itemTypes[i] : "現烤烤餅";
