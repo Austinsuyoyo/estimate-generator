@@ -20,44 +20,29 @@ const CONFIG = {
 
 export default {
 	async fetch(request, env, ctx) {
-		// 檢查是否為機器人或超過請求頻率
 		const botCheck = await checkForBots(request);
-		if (botCheck.status !== 200) {
-			// 如果狀態不是 200，直接返回對應錯誤
-			return new Response(botCheck.message, { status: botCheck.status });
-		}
+		if (botCheck.status !== 200) return new Response(botCheck.message, { status: botCheck.status });
+		if (request.method === "OPTIONS") return handleCorsPreflightRequest();
 
-		// 處理 CORS 預檢請求
-		if (request.method === "OPTIONS") {
-			return handleCorsPreflightRequest();
-		}
-
-		// 根據請求方法處理
-		if (request.method === "GET") {
-			const response = new Response(formHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-			if (botCheck.newCookie) response.headers.append("Set-Cookie", botCheck.newCookie);
-			return response;
-		} else if (request.method === "POST") {
-			// 驗證請求來源
-			const { isValid, errorResponse } = validateRequestSource(request);
-			if (!isValid) return errorResponse;
-
-			// 處理表單數據
-			const formData = await request.formData();
-			const processedData = await processFormData(formData);
-			const outputHtml = templateReplace(quoteTemplate, processedData);
-
-			// 回應
-			const response = new Response(outputHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-			if (botCheck.newCookie) response.headers.append("Set-Cookie", botCheck.newCookie);
-			return response;
-		} else {
-			return new Response("Method Not Allowed", { status: 405 });
-		}
+		const response = request.method === "GET" 
+			? new Response(formHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } })
+			: await handlePostRequest(request);
+		
+		if (botCheck.newCookie) response.headers.append("Set-Cookie", botCheck.newCookie);
+		return response;
 	}
 };
 
-// 驗證請求來源
+async function handlePostRequest(request) {
+	const { isValid, errorResponse } = validateRequestSource(request);
+	if (!isValid) return errorResponse;
+
+	const formData = await request.formData();
+	const processedData = await processFormData(formData);
+	const outputHtml = templateReplace(quoteTemplate, processedData);
+	return new Response(outputHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+}
+
 function validateRequestSource(request) {
 	const refererHeader = request.headers.get("Referer") || "";
 	const cookies = getCookies(request);
@@ -65,90 +50,49 @@ function validateRequestSource(request) {
 	const lastRequestData = cookies[clientIP] ? cookies[clientIP].split("|") : null;
 
 	if (!refererHeader || !lastRequestData) {
-		// 不符合條件，返回隨機錯誤訊息
-		const randomIndex = Math.floor(Math.random() * CONFIG.hotComputerRoasts.length);
-		const errorMessage = CONFIG.hotComputerRoasts[randomIndex];
-		
-		return {
-			isValid: false,
-			errorResponse: new Response(errorMessage, { status: 400 })
-		};
+		const errorMessage = CONFIG.hotComputerRoasts[Math.floor(Math.random() * CONFIG.hotComputerRoasts.length)];
+		return { isValid: false, errorResponse: new Response(errorMessage, { status: 400 }) };
 	}
-
 	return { isValid: true };
 }
 
-// 處理表單數據
 async function processFormData(formData) {
-	// 定義表單欄位配置
 	const FORM_FIELDS = [
-		// 乙方資料（報價方）
 		{ key: "providerLogo", defaultValue: DEFAULT_LOGO_URL },
-		{ key: "providerName", defaultValue: "" },
-		{ key: "providerAddress", defaultValue: "" },
-		{ key: "providerPhone", defaultValue: "" },
-		{ key: "providerStaffName", defaultValue: "" },
-		// 客戶資料
-		{ key: "customerName", defaultValue: "" },
-		{ key: "customerAddress", defaultValue: "" },
-		{ key: "customerPhone", defaultValue: "" },
-		{ key: "customerFax", defaultValue: "" },
-		{ key: "customerTaxId", defaultValue: "" },
-		// 聯絡人資料
-		{ key: "contactName", defaultValue: "" },
-		{ key: "contactPhone", defaultValue: "" },
-		{ key: "contactGender", defaultValue: "先生" },
-		{ key: "contactAddresss", defaultValue: "" },
-		// 報價單資訊
-		{ key: "orderType", defaultValue: "" },
-		{ key: "quoteNumber", defaultValue: "" },
-		{ key: "quoteDate", defaultValue: "" },
-		{ key: "deadline", defaultValue: "" },
-		{ key: "deliveryDate", defaultValue: "" },
-		{ key: "deliveryDay", defaultValue: "" },
-		{ key: "deliveryTime", defaultValue: "" },
-		{ key: "deliveryStoreName", defaultValue: "" },
-		{ key: "taxPercent", defaultValue: "0" },
-		{ key: "remarks", defaultValue: "" },
-		{ key: "validDays", defaultValue: "7" }
+		{ key: "providerName", defaultValue: "" }, { key: "providerAddress", defaultValue: "" },
+		{ key: "providerPhone", defaultValue: "" }, { key: "providerStaffName", defaultValue: "" },
+		{ key: "customerName", defaultValue: "" }, { key: "customerAddress", defaultValue: "" },
+		{ key: "customerPhone", defaultValue: "" }, { key: "customerFax", defaultValue: "" },
+		{ key: "customerTaxId", defaultValue: "" }, { key: "contactName", defaultValue: "" },
+		{ key: "contactPhone", defaultValue: "" }, { key: "contactGender", defaultValue: "先生" },
+		{ key: "contactAddresss", defaultValue: "" }, { key: "orderType", defaultValue: "" },
+		{ key: "quoteNumber", defaultValue: "" }, { key: "quoteDate", defaultValue: "" },
+		{ key: "deadline", defaultValue: "" }, { key: "deliveryDate", defaultValue: "" },
+		{ key: "deliveryDay", defaultValue: "" }, { key: "deliveryTime", defaultValue: "" },
+		{ key: "deliveryStoreName", defaultValue: "" }, { key: "taxPercent", defaultValue: "0" },
+		{ key: "remarks", defaultValue: "" }, { key: "validDays", defaultValue: "7" }
 	];
 
-	// 基本資料
 	const data = {};
-	
-	// 從配置中獲取所有欄位並填充數據
-	FORM_FIELDS.forEach(field => {
-		const formKey = field.formKey || field.key;
-		data[field.key] = formData.get(formKey) || field.defaultValue;
-	});
+	FORM_FIELDS.forEach(field => data[field.key] = formData.get(field.formKey || field.key) || field.defaultValue);
 
-	// 處理項目數據
 	const { itemsHtml, subtotal, itemsJson } = processItemsData(formData);
 	const taxPercent = parseFloat(data.taxPercent || "0");
 	const taxAmount = Math.floor(subtotal * (taxPercent / 100));
 	
-	// 處理 Logo 轉換為 Base64
 	let logoBase64 = "";
 	try {
 		logoBase64 = await convertImageToBase64(data.providerLogo);
 	} catch (error) {
 		console.error("Error converting logo to Base64:", error);
-		if (data.providerLogo !== DEFAULT_LOGO_URL) {
-			try { logoBase64 = await convertImageToBase64(DEFAULT_LOGO_URL); } 
-			catch (fallbackError) { logoBase64 = data.providerLogo; }
-		} else {
-			logoBase64 = data.providerLogo;
-		}
+		logoBase64 = data.providerLogo !== DEFAULT_LOGO_URL 
+			? await convertImageToBase64(DEFAULT_LOGO_URL).catch(() => data.providerLogo)
+			: data.providerLogo;
 	}
 	
-	// 合併所有數據
 	return {
-		...data,
-		logoBase64,
-		itemsHtml,
-		itemsJson: JSON.stringify(itemsJson), // 添加 JSON 格式的項目數據
-		subtotalFormatted: formatNumber(subtotal),
-		taxPercent,
+		...data, logoBase64, itemsHtml, itemsJson: JSON.stringify(itemsJson),
+		subtotalFormatted: formatNumber(subtotal), taxPercent,
 		taxAmountFormatted: formatNumber(taxAmount),
 		taxDisplay: taxPercent === 0 ? "內含" : formatNumber(taxAmount),
 		totalFormatted: formatNumber(subtotal + taxAmount),
@@ -157,41 +101,25 @@ async function processFormData(formData) {
 	};
 }
 
-// 處理項目數據
 function processItemsData(formData) {
-	// 新的處理方式：根據 item_ID_ 前綴分組
-	const itemsMap = new Map(); // 用於存儲按 ID 分組的項目數據
+	const itemsMap = new Map();
 	
-	// 遍歷所有表單欄位，找出項目相關的欄位並按 ID 分組
 	for (const [key, value] of formData.entries()) {
-		// 檢查是否是項目相關的欄位
 		if (key.startsWith('item_')) {
-			// 解析欄位名稱：item_ID_fieldname
 			const parts = key.split('_');
 			if (parts.length >= 3) {
-				// 提取 ID 和欄位名稱
-				const id = parts[1]; // 第二部分是 ID
-				const fieldName = parts.slice(2).join('_'); // 第三部分及之後是欄位名稱
-				
-				// 確保該 ID 在 Map 中有一個對象
-				if (!itemsMap.has(id)) {
-					itemsMap.set(id, {});
-				}
-				
-				// 將值存儲到對應的對象中
+				const id = parts[1];
+				const fieldName = parts.slice(2).join('_');
+				if (!itemsMap.has(id)) itemsMap.set(id, {});
 				itemsMap.get(id)[fieldName] = value;
 			}
 		}
 	}
 	
-	// 將 Map 轉換為數組
 	const itemsArray = Array.from(itemsMap.values());
-	
-	// 生成項目 HTML 並計算小計
 	let itemsHtml = "", subtotal = 0;
-	const itemsJson = []; // 用於匯出 JSON
+	const itemsJson = [];
 	
-	// 處理每個項目
 	itemsArray.forEach((item, index) => {
 		const type = item.type || "現烤烤餅";
 		const name = item.name || "";
@@ -201,16 +129,7 @@ function processItemsData(formData) {
 		const lineTotal = qty * price;
 		subtotal += lineTotal;
 		
-		// 添加到 JSON 數組
-		const jsonItem = {
-			type: type,
-			name: name,
-			desc: desc,
-			qty: qty,
-			price: price
-		};
-		
-		// 如果是飲料，添加客製化選項
+		const jsonItem = { type, name, desc, qty, price };
 		if (type === '飲料') {
 			jsonItem.customOptions = {
 				sweetness: item.sweetness || '',
@@ -220,25 +139,17 @@ function processItemsData(formData) {
 		
 		itemsJson.push(jsonItem);
 		
-		// 交換品名和項目的顯示
-		let displayName = type; // 品名顯示為烤餅類型
-		let displayDesc = name; // 項目顯示為口味
+		let displayDesc = name;
 		if (desc && desc.trim() !== "") displayDesc += " - " + desc;
 		
-		itemsHtml += `<tr>
-			<td>${index + 1}</td>
-			<td>${displayName}</td>
-			<td>${displayDesc}</td>
-			<td>${formatNumber(qty)}</td>
-			<td>${formatNumber(price)}</td>
-			<td>${formatNumber(lineTotal)}</td>
-		</tr>`;
+		itemsHtml += `<tr><td>${index + 1}</td><td>${type}</td><td>${displayDesc}</td>
+			<td>${formatNumber(qty)}</td><td>${formatNumber(price)}</td>
+			<td>${formatNumber(lineTotal)}</td></tr>`;
 	});
 	
 	return { itemsHtml, subtotal, itemsJson };
 }
 
-// 處理備註內容
 function processRemarks(remarks, data) {
 	return remarks
 		.replace(/{{deliveryDate}}/g, data.deliveryDate)
@@ -248,66 +159,35 @@ function processRemarks(remarks, data) {
 		.replace(/{{deliveryStoreName}}/g, data.deliveryStoreName);
 }
 
-// 將數字轉為整數並以逗號分隔的格式，例如 25000 -> "25,000"
 function formatNumber(num) {
 	return Math.floor(num).toLocaleString('en-US');
 }
 
-// 簡單的模板替換函式，會把 {{key}} 替換成 data[key]
 function templateReplace(template, data) {
-	return template.replace(/{{\s*([\w]+)\s*}}/g, (match, key) => {
-		return data[key] !== undefined ? data[key] : "";
-	});
+	return template.replace(/{{\s*([\w]+)\s*}}/g, (match, key) => data[key] !== undefined ? data[key] : "");
 }
 
 async function convertImageToBase64(url) {
 	const response = await fetch(url);
-
-	// 1) 狀態碼不是 2xx，就拋錯
-	if (!response.ok) {
-		throw new Error(`Failed to fetch image. Status: ${response.status} ${response.statusText}`);
-	}
-
-	// 2) 取得 Content-Type，若無就預設 "image/png"
+	if (!response.ok) throw new Error(`Failed to fetch image: ${response.status}`);
+	
 	const contentType = response.headers.get("Content-Type") || "image/png";
-
-	// 3) 黑名單檢查（若 Content-Type 含有 "text" 或 "html" 等就丟錯）
-	const blackList = ["text", "html"];
-	if (blackList.some(word => contentType.toLowerCase().includes(word))) {
+	if (["text", "html"].some(word => contentType.toLowerCase().includes(word)))
 		throw new Error(`Invalid Content-Type: ${contentType}`);
-	}
-
-	// 4) 轉 ArrayBuffer -> base64
+	
 	const buffer = await response.arrayBuffer();
-	const base64 = arrayBufferToBase64(buffer);
+	const base64 = btoa([...new Uint8Array(buffer)].map(b => String.fromCharCode(b)).join(''));
 	return `data:${contentType};base64,${base64}`;
 }
 
-function arrayBufferToBase64(buffer) {
-	let binary = '';
-	const bytes = new Uint8Array(buffer);
-	const len = bytes.byteLength;
-	for (let i = 0; i < len; i++) {
-		binary += String.fromCharCode(bytes[i]);
-	}
-	return btoa(binary);
-}
-
-// **反機器人與 IP 限制請求檢查**
 async function checkForBots(request) {
 	const userAgent = request.headers.get("User-Agent") || "";
 	const clientIP = request.headers.get("CF-Connecting-IP") || "unknown";
 
-	// 若檢測到機器人，返回 dict
 	if (!userAgent || CONFIG.botPatterns.test(userAgent)) {
-		return {
-			status: 403,
-			message: "Forbidden: Automated requests are not allowed",
-			newCookie: ""
-		};
+		return { status: 403, message: "Forbidden: Automated requests are not allowed", newCookie: "" };
 	}
 
-	// 檢查請求頻率
 	const cookies = getCookies(request);
 	const lastRequestData = cookies[clientIP] ? cookies[clientIP].split("|") : null;
 	let requestCount = 1, firstRequestTime = Date.now();
@@ -318,48 +198,31 @@ async function checkForBots(request) {
 
 		if (Date.now() - firstRequestTime < CONFIG.timeWindow) {
 			if (requestCount >= CONFIG.maxRequests) {
-				// 超過請求頻率限制
-				const randomIndex = Math.floor(Math.random() * CONFIG.hotComputerRoasts.length);
-				const errorMessage = CONFIG.hotComputerRoasts[randomIndex];
-
-				return {
-					status: 429,
-					message: errorMessage,
-					newCookie: ""
-				};
+				const errorMessage = CONFIG.hotComputerRoasts[Math.floor(Math.random() * CONFIG.hotComputerRoasts.length)];
+				return { status: 429, message: errorMessage, newCookie: "" };
 			}
 			requestCount++;
 		} else {
-			// 超過時間窗口，重置計數
 			requestCount = 1;
 			firstRequestTime = Date.now();
 		}
 	}
 	
-	// 設置新的 Cookie（更新請求次數和時間戳）
-	const newCookie = `${clientIP}=${requestCount}|${firstRequestTime}; Max-Age=60; Path=/; HttpOnly; Secure`;
-
 	return {
-		status: 200,
-		message: "OK",
-		newCookie
+		status: 200, message: "OK",
+		newCookie: `${clientIP}=${requestCount}|${firstRequestTime}; Max-Age=60; Path=/; HttpOnly; Secure`
 	};
 }
 
-// **輔助函數：解析 Cookie**
 function getCookies(request) {
 	const cookieHeader = request.headers.get("Cookie");
 	if (!cookieHeader) return {};
-
-	return Object.fromEntries(
-		cookieHeader.split(";").map(cookie => {
-			const [key, value] = cookie.trim().split("=");
-			return [key, value];
-		})
-	);
+	return Object.fromEntries(cookieHeader.split(";").map(cookie => {
+		const [key, value] = cookie.trim().split("=");
+		return [key, value];
+	}));
 }
 
-// 處理 CORS 預檢請求
 function handleCorsPreflightRequest() {
 	return new Response(null, {
 		status: 204,
