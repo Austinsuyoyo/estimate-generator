@@ -7,7 +7,287 @@
     <title>報價單產生器</title>
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
+      :root {
+        /* 淺色主題（預設） */
+        --primary-100:#2e8b57;
+        --primary-200:#61bc84;
+        --primary-300:#c6ffe6;
+        --accent-100:#8fbc8f;
+        --accent-200:#345e37;
+        --text-100:#333333;
+        --text-200:#5c5c5c;
+        --bg-100:#FFFFFF;
+        --bg-200:#f5f5f5;
+        --bg-300:#cccccc;
+        --success-200:#4CAF50;
+        --bg-400:#444;
+      }
+      
+      [data-theme="dark"] {
+        /* 深色主題 */
+        --primary-100:#2E8B57;
+        --primary-200:#61bc84;
+        --primary-300:#c6ffe6;
+        --accent-100:#8FBC8F;
+        --accent-200:#345e37;
+        --text-100:#FFFFFF;
+        --text-200:#e0e0e0;
+        --bg-100:#1E1E1E;
+        --bg-200:#2d2d2d;
+        --bg-300:#454545;
+      }
+      
+      /* 套用主題顏色 */
+      body {
+        background-color: var(--bg-100);
+        color: var(--text-100);
+        transition: all 0.3s ease;
+      }
+      
+      h1, h2, h3, h4, h5, h6 {
+        color: var(--text-100);
+      }
+      
+      hr {
+        border-color: var(--bg-300);
+      }
+      
+      .card {
+        background-color: var(--bg-200);
+        border-color: var(--bg-300);
+      }
+      
+      .card-header {
+        background-color: var(--primary-100) !important;
+        color: white !important;
+        font-weight: bold;
+      }
+      
+      .form-control, .form-select {
+        background-color: var(--bg-100);
+        color: var(--text-100);
+        border-color: var(--bg-300);
+      }
+      
+      .form-control:focus, .form-select:focus {
+        background-color: var(--bg-100);
+        color: var(--text-100);
+        border-color: var(--primary-100);
+        box-shadow: 0 0 0 0.25rem rgba(46, 139, 87, 0.25);
+      }
+      
+      .form-control::placeholder {
+        color: var(--text-200);
+      }
+      
+      .form-label {
+        color: var(--text-100);
+        font-weight: 500;
+      }
+      
+      .table {
+        color: var(--text-100);
+        border-color: var(--bg-300);
+      }
+      
+      .table th {
+        background-color: var(--bg-300);
+        color: var(--text-100);
+        border-color: var(--bg-300);
+      }
+      
+      .table td {
+        background-color: var(--bg-200);
+        border-color: var(--bg-300);
+      }
+      
+      /* 確保表格標題在深色主題下可見 */
+      .table th, .table td {
+        color: var(--text-100) !important;
+      }
+      
+      /* 小計、稅金、總計表格樣式 */
+      .table-bordered th, .table-bordered td {
+        border-color: var(--bg-300) !important;
+      }
+      
+      /* 深色主題下表格標題加強 */
+      [data-theme="dark"] .table th {
+        background-color: var(--accent-200) !important;
+        color: white !important;
+        font-weight: bold;
+      }
+      
+      /* 深色主題下表格內容加強 */
+      [data-theme="dark"] .table td {
+        background-color: var(--bg-200) !important;
+      }
+      
+      /* 小計、稅金、總計行特殊樣式 */
+      .table tr.subtotal td, .table tr.tax td, .table tr.total td {
+        font-weight: bold !important;
+        font-size: 1.05em;
+      }
+      
+      /* 深色主題下小計、稅金、總計行特殊樣式 */
+      [data-theme="dark"] .table tr.subtotal td, 
+      [data-theme="dark"] .table tr.tax td, 
+      [data-theme="dark"] .table tr.total td {
+        background-color: var(--accent-100) !important;
+        color: white !important;
+      }
+      
+      /* 總計行特別突出 */
+      .table tr.total td {
+        font-size: 1.1em !important;
+        color: var(--primary-100) !important;
+      }
+      
+      [data-theme="dark"] .table tr.total td {
+        background-color: var(--primary-100) !important;
+        color: white !important;
+      }
+      
+      .modal-content {
+        background-color: var(--bg-200);
+        color: var(--text-100);
+        border-color: var(--bg-300);
+      }
+      
+      .modal-header, .modal-footer {
+        border-color: var(--bg-300);
+      }
+      
+      .btn-outline-primary {
+        color: var(--primary-100);
+        border-color: var(--primary-100);
+      }
+      
+      .btn-outline-primary:hover {
+        background-color: var(--primary-100);
+        color: white;
+      }
+      
+      .btn-outline-info {
+        color: var(--accent-100);
+        border-color: var(--accent-100);
+      }
+      
+      .btn-outline-info:hover {
+        background-color: var(--accent-100);
+        color: white;
+      }
+      
+      .btn-primary {
+        background-color: var(--primary-100);
+        border-color: var(--primary-100);
+      }
+      
+      .btn-primary:hover {
+        background-color: var(--accent-200);
+        border-color: var(--accent-200);
+      }
+      
+      .btn-success {
+        background-color: var(--primary-200);
+        border-color: var(--primary-200);
+      }
+      
+      .btn-success:hover {
+        background-color: var(--primary-100);
+        border-color: var(--primary-100);
+      }
+      
+      .btn-info {
+        background-color: var(--accent-100);
+        border-color: var(--accent-100);
+      }
+      
+      .btn-info:hover {
+        background-color: var(--accent-200);
+        border-color: var(--accent-200);
+      }
+      
+      .btn-secondary {
+        background-color: var(--bg-300);
+        border-color: var(--bg-300);
+        color: var(--text-100);
+      }
+      
+      .btn-secondary:hover {
+        background-color: var(--text-200);
+        border-color: var(--text-200);
+      }
+      
+      .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+      }
+      
+      .alert-warning {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: var(--text-100);
+        border-color: rgba(255, 193, 7, 0.5);
+      }
+      
+      /* 主題切換按鈕樣式 */
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--bg-200);
+        color: var(--text-100);
+        border: 1px solid var(--bg-300);
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+      }
+      
+      .theme-toggle:hover {
+        background-color: var(--bg-300);
+        transform: rotate(30deg);
+      }
+      
+      /* 淺色主題下的特殊調整 */
+      [data-theme="light"] .btn-add-item {
+        background-color: var(--primary-100);
+        border-color: var(--primary-100);
+        color: white !important;
+      }
+      
+      [data-theme="light"] .btn-add-item:hover {
+        background-color: var(--primary-200);
+        border-color: var(--primary-200);
+        color: white !important;
+      }
+      
+      /* 深色主題下的特殊調整 */
+      [data-theme="dark"] .btn-add-item {
+        background-color: var(--primary-100);
+        border-color: var(--primary-100);
+        color: white !important;
+      }
+      
+      [data-theme="dark"] .btn-add-item:hover {
+        background-color: var(--primary-200);
+        border-color: var(--primary-200);
+        color: white !important;
+      }
+      
+      [data-theme="dark"] .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+      }
+      
       /* 額外自訂樣式 */
       #submitButton {
         bottom: 20px;
@@ -27,17 +307,72 @@
       .form-label {
         font-weight: 500;
       }
-      .table th {
-        background-color: #f8f9fa;
+
+      
+      /* 浮動按鈕樣式 */
+      .floating-menu {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        z-index: 999;
       }
-      .btn-add-item {
-        background-color: #28a745;
-        border-color: #28a745;
+      .floating-menu .btn-floating {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        background-color: var(--bg-200);
+        border: 1px solid var(--bg-300);
       }
-      .btn-add-item:hover {
-        background-color: #218838;
-        border-color: #1e7e34;
+      
+      /* 特定按鈕樣式 */
+      .floating-menu .btn-floating.btn-info {
+        background-color: var(--accent-100);
+        border-color: var(--accent-100);
+        color: white;
       }
+      
+      .floating-menu .btn-floating.btn-primary {
+        background-color: var(--primary-100);
+        border-color: var(--primary-100);
+        color: white;
+      }
+      
+      .floating-menu .btn-floating.btn-success {
+        background-color: var(--success-200);
+        border-color: var(--success-200);
+        color: white;
+      }
+      
+      .floating-menu .btn-floating:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      }
+      
+      .floating-menu .btn-floating i {
+        font-size: 1.2rem;
+      }
+      
+      /* 移除不必要的按鈕樣式 */
+      .floating-menu .btn-floating.btn-info,
+      .floating-menu .btn-floating.btn-primary,
+      .floating-menu .btn-floating.btn-success {
+        background-color: var(--primary-100);
+        border-color: var(--primary-100);
+        color: white;
+      }
+
+      .floating-menu .btn-floating.btn-info:hover,
+      .floating-menu .btn-floating.btn-primary:hover,
+      .floating-menu .btn-floating.btn-success:hover {
+        background-color: var(--primary-200);
+        border-color: var(--primary-200);
+      }
+      
       /* 響應式設計優化 */
       @media (max-width: 768px) {
         .container {
@@ -67,10 +402,72 @@
           margin-bottom: 5px;
         }
       }
+      .form-check-input {
+        background-color: var(--bg-100);
+        border-color: var(--bg-300);
+      }
+      
+      .form-check-input:checked {
+        background-color: var(--primary-100);
+        border-color: var(--primary-100);
+      }
+      
+      .form-check-label {
+        color: var(--text-100);
+      }
+      
+      textarea {
+        background-color: var(--bg-100) !important;
+        color: var(--text-100) !important;
+      }
+      
+      /* Toast 樣式 */
+      .toast {
+        background-color: var(--bg-200);
+        color: var(--text-100);
+        border-color: var(--bg-300);
+      }
+      
+      .toast-body {
+        background-color: var(--bg-200);
+        color: var(--text-100);
+      }
+      
+      /* 確保按鈕在深色主題下的文字顏色 */
+      .btn-primary, .btn-success, .btn-info, .btn-warning {
+        color: white !important;
+      }
+      
+      /* 確保按鈕在深色主題下的懸停效果 */
+      [data-theme="dark"] .btn-primary:hover {
+        background-color: var(--primary-200) !important;
+        border-color: var(--primary-200) !important;
+      }
+      
+      [data-theme="dark"] .btn-info:hover {
+        background-color: var(--accent-200) !important;
+        border-color: var(--accent-200) !important;
+      }
+      
+      [data-theme="dark"] .btn-success:hover {
+        background-color: var(--success-200) !important;
+        border-color: var(--success-200) !important;
+      }
+      
+      [data-theme="dark"] .btn-secondary:hover {
+        background-color: var(--bg-400) !important;
+        border-color: var(--bg-400) !important;
+      }
     </style>
   </head>
 
   <body>
+    <!-- 主題切換按鈕 -->
+    <button class="theme-toggle" id="themeToggle" title="切換深色/淺色主題">
+      <i class="bi bi-sun-fill" id="lightIcon"></i>
+      <i class="bi bi-moon-fill" id="darkIcon" style="display: none;"></i>
+    </button>
+    
     <div class="container my-4">
       <h1 class="text-center mb-4">報價單產生器</h1>
       <!-- method="POST" 只是示例，實際動作需搭配後端設定 -->
@@ -227,7 +624,7 @@
               <div class="card-body">
                 <div class="d-flex flex-wrap mb-3">
                   <div class="btn-group-sm mb-2 me-auto">
-                    <button type="button" id="addBakeryButton" class="btn btn-add-item text-white me-2 mb-1">
+                    <button type="button" id="addBakeryButton" class="btn btn-primary text-white me-2 mb-1">
                       ＋ 新增烤餅
                     </button>
                     <button type="button" id="addDrinkButton" class="btn btn-info text-white me-2 mb-1">
@@ -245,38 +642,29 @@
                   <table class="table table-bordered" id="itemsTable">
                     <thead>
                       <tr>
-                        <th style="width: 30%">品名</th>
-                        <th style="width: 50%">項目</th>
+                        <th style="width: 40%">品名</th>
+                        <th style="width: 40%">項目</th>
                         <th style="width: 20%">操作</th>
                       </tr>
                     </thead>
                     <tbody>
                       <!-- 此處預設不放任何<tr>，直接靠JS動態插入 -->
                     </tbody>
+                    <tfoot>
+                      <tr class="subtotal">
+                        <td colspan="2" class="text-end fw-bold">小計：</td>
+                        <td class="fw-bold">$<span id="subtotal">0.00</span></td>
+                      </tr>
+                      <tr class="tax">
+                        <td colspan="2" class="text-end fw-bold">稅金 (5%)：</td>
+                        <td class="fw-bold">$<span id="tax">0.00</span></td>
+                      </tr>
+                      <tr class="total">
+                        <td colspan="2" class="text-end fw-bold">總計：</td>
+                        <td class="fw-bold">$<span id="total">0.00</span></td>
+                      </tr>
+                    </tfoot>
                   </table>
-                </div>
-                <div class="row mt-3">
-                  <div class="col-md-4 mb-3">
-                    <label for="taxPercent" class="form-label">稅金百分比 (%)</label>
-                    <input type="number" class="form-control" id="taxPercent" name="taxPercent" step="1" min="0" value="0" required />
-                  </div>
-                  <div class="col-md-8">
-                    <!-- Totals 以兩行表格呈現 -->
-                    <div class="table-responsive">
-                      <table class="table table-bordered text-center">
-                        <tr>
-                          <th>小計</th>
-                          <th>稅金</th>
-                          <th>總計</th>
-                        </tr>
-                        <tr>
-                          <td id="subtotalDisplay">0</td>
-                          <td id="taxDisplay">0</td>
-                          <td id="totalDisplay">0</td>
-                        </tr>
-                      </table>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -291,25 +679,129 @@
           <div class="mb-4 mt-5">
             <hr> <!-- 分隔線，表示這是系統功能 -->
             <h3 class="text-center">系統功能</h3>
-            <!-- 匯出 JSON -->
-            <div class="mb-3">
-              <label for="exportedJson" class="form-label">匯出 JSON</label>
-              <textarea class="form-control" id="exportedJson" rows="5" readonly></textarea>
-              <button type="button" class="btn btn-primary mt-2" onclick="exportFormData()">匯出</button>
-              <button type="button" class="btn btn-secondary mt-2" onclick="copyExportedJson()">複製 JSON</button>
-              <button type="button" class="btn btn-secondary mt-2" onclick="downloadJson()">下載 JSON</button>
-            </div>
-            <!-- 匯入 JSON -->
-            <div class="mb-3">
-              <label for="importJson" class="form-label">匯入 JSON</label>
-              <textarea class="form-control" id="importJson" rows="5" placeholder="請貼上 JSON"></textarea>
-              <button type="button" class="btn btn-success mt-2" onclick="importFormData()">匯入</button>
+            
+            <div class="btn-group mb-3 w-100">
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exportModal">
+                <i class="bi bi-box-arrow-up"></i> 匯出 JSON
+              </button>
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importModal">
+                <i class="bi bi-box-arrow-in-down"></i> 匯入 JSON
+              </button>
+              <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#localStorageModal">
+                <i class="bi bi-database"></i> 本地儲存管理
+              </button>
             </div>
           </div>
           <!-- ./ -->
         </div>
       </form>
     </div>
+
+    <!-- 浮動按鈕菜單 -->
+    <div class="floating-menu">
+      <button type="button" class="btn btn-info btn-floating" data-bs-toggle="modal" data-bs-target="#exportModal" title="匯出 JSON">
+        <i class="bi bi-box-arrow-up"></i>
+      </button>
+      <button type="button" class="btn btn-primary btn-floating" data-bs-toggle="modal" data-bs-target="#importModal" title="匯入 JSON">
+        <i class="bi bi-box-arrow-in-down"></i>
+      </button>
+      <button type="button" class="btn btn-success btn-floating" data-bs-toggle="modal" data-bs-target="#localStorageModal" title="本地儲存管理">
+        <i class="bi bi-database"></i>
+      </button>
+    </div>
+
+    <!-- 匯出 JSON 模態框 -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exportModalLabel">匯出 JSON</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" id="exportedJson" rows="10" readonly></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+            <button type="button" class="btn btn-primary" onclick="exportFormData()">
+              <i class="bi bi-arrow-clockwise"></i> 更新
+            </button>
+            <button type="button" class="btn btn-success" onclick="copyExportedJson()">
+              <i class="bi bi-clipboard"></i> 複製
+            </button>
+            <button type="button" class="btn btn-info" onclick="downloadJson()">
+              <i class="bi bi-download"></i> 下載
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 匯入 JSON 模態框 -->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="importModalLabel">匯入 JSON</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" id="importJson" rows="10" placeholder="請貼上 JSON"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+            <button type="button" class="btn btn-primary" onclick="importFormData()">匯入</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 本地儲存管理模態框 -->
+    <div class="modal fade" id="localStorageModal" tabindex="-1" aria-labelledby="localStorageModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="localStorageModalLabel">本地儲存管理</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>您的表單數據會自動保存在瀏覽器的本地儲存中。</p>
+            <div class="alert alert-warning">
+              <strong>注意：</strong> 清除瀏覽器緩存或使用隱私模式可能會導致數據丟失。
+            </div>
+            
+            <div class="mb-4">
+              <h5>主題設置</h5>
+              <div class="btn-group w-100 mb-3">
+                <button type="button" class="btn btn-outline-primary" onclick="setTheme('light')">
+                  <i class="bi bi-sun-fill"></i> 淺色主題
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="setTheme('dark')">
+                  <i class="bi bi-moon-fill"></i> 深色主題
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="setTheme('auto')">
+                  <i class="bi bi-circle-half"></i> 跟隨系統
+                </button>
+              </div>
+            </div>
+            
+            <h5>數據管理</h5>
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-primary" onclick="saveFormDataToLocalStorage(); showToast('保存成功', '表單數據已手動保存到本地儲存', 'success'); $('#localStorageModal').modal('hide');">
+                <i class="bi bi-save"></i> 手動保存當前表單
+              </button>
+              <button type="button" class="btn btn-danger" onclick="if(confirm('確定要清除本地儲存的表單數據嗎？此操作無法撤銷。')) { clearLocalStorageData(); $('#localStorageModal').modal('hide'); }">
+                <i class="bi bi-trash"></i> 清除本地儲存數據
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 通用品項模板 -->
     <script type="text/template" id="itemTemplate">
       <tr class="descRow">
@@ -511,10 +1003,14 @@
       
       $("#itemsTable tbody").append(templateHtml);
       updateTotals();
+      
+      // 自動保存
+      saveFormDataToLocalStorage();
+      
       return item_id;
     }
 
-    // 刪除品項
+    // 刪除行
     function removeRow(button) {
       const $btn = $(button);
       const $row = $btn.closest("tr");
@@ -524,6 +1020,9 @@
         $row.remove();
         $relatedRow.remove();
         updateTotals();
+        
+        // 自動保存
+        saveFormDataToLocalStorage();
       } else {
         alert("至少需保留一個品項");
       }
@@ -698,28 +1197,65 @@
       }
 
       $("#exportedJson").val(JSON.stringify(formData, null, 2));
+      
+      // 保存到 localStorage
+      saveFormDataToLocalStorage(formData);
+      
+      return formData;
     }
 
     // 複製 JSON 到剪貼簿
     function copyExportedJson() {
       const jsonText = $("#exportedJson").val();
       if (!jsonText) {
-        alert("請先點擊『匯出』按鈕產生 JSON");
+        alert("請先點擊『更新』按鈕產生 JSON");
         return;
       }
-      const exportedJson = document.getElementById("exportedJson");
-      exportedJson.select();
-      document.execCommand("copy");
-      alert("JSON 已複製");
+      
+      // 使用現代的 Clipboard API
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(jsonText)
+          .then(() => {
+            // 顯示成功提示
+            const copyBtn = $('#exportModal').find('button:contains("複製")');
+            const originalText = copyBtn.html();
+            copyBtn.html('<i class="bi bi-check-lg"></i> 已複製');
+            setTimeout(() => {
+              copyBtn.html(originalText);
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('複製失敗:', err);
+            alert("複製失敗，請手動選取並複製");
+          });
+      } else {
+        // 備用方法
+        const exportedJson = document.getElementById("exportedJson");
+        exportedJson.select();
+        document.execCommand("copy");
+        alert("JSON 已複製");
+      }
     }
 
     // 匯入 JSON 到表單
     function importFormData() {
       const jsonText = $("#importJson").val();
+      if (!jsonText || jsonText.trim() === '') {
+        alert("請先貼上 JSON 數據");
+        return;
+      }
+      
       try {
         const data = JSON.parse(jsonText);
         performLocalImport(data);
+        
+        // 關閉模態框
+        $('#importModal').modal('hide');
+        
+        // 顯示成功提示
+        showToast('匯入成功', '表單數據已成功匯入', 'success');
       } catch (error) {
+        console.error('JSON 解析錯誤:', error);
         alert("JSON 格式錯誤，請確認格式是否正確");
       }
     }
@@ -804,10 +1340,12 @@
 
         if (data.deliveryDate) updateDeliveryDay();
         updateTotals();
-        alert("JSON 本地匯入成功");
+        
+        // 保存到 localStorage
+        saveFormDataToLocalStorage(data);
       } catch (error) {
         console.error("本地匯入錯誤:", error);
-        alert("JSON 匯入失敗：" + error.message);
+        showToast('匯入失敗', `匯入過程中發生錯誤: ${error.message}`, 'error');
       }
     }
 
@@ -858,10 +1396,224 @@
       updateTotals();
     }
 
+    // 保存表單數據到 localStorage
+    function saveFormDataToLocalStorage(formData = null) {
+      try {
+        if (!formData) {
+          formData = exportFormData();
+        }
+        localStorage.setItem('estimateFormData', JSON.stringify(formData));
+        console.log('表單數據已保存到本地儲存');
+      } catch (error) {
+        console.error('保存表單數據到本地儲存時出錯:', error);
+        showToast('保存失敗', `保存到本地儲存時出錯: ${error.message}`, 'error');
+      }
+    }
+
+    // 從 localStorage 加載表單數據
+    function loadFormDataFromLocalStorage() {
+      try {
+        const savedData = localStorage.getItem('estimateFormData');
+        if (savedData) {
+          const formData = JSON.parse(savedData);
+          performLocalImport(formData);
+          console.log('從本地儲存加載表單數據成功');
+          
+          // 顯示通知
+          showLocalStorageNotification();
+        }
+      } catch (error) {
+        console.error('從本地儲存加載表單數據時出錯:', error);
+        showToast('加載失敗', `從本地儲存加載數據時出錯: ${error.message}`, 'error');
+      }
+    }
+
+    // 顯示本地儲存通知
+    function showLocalStorageNotification() {
+      // 檢查是否已經顯示過通知
+      if (localStorage.getItem('localStorageNotificationShown')) {
+        return;
+      }
+      
+      // 創建通知元素
+      const notification = $(`
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+          <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-info text-white">
+              <strong class="me-auto">自動保存功能</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              <p>您的表單數據會自動保存在瀏覽器中。</p>
+              <p>您可以通過「本地儲存管理」按鈕管理保存的數據。</p>
+              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#localStorageModal">
+                查看詳情
+              </button>
+            </div>
+          </div>
+        </div>
+      `);
+      
+      // 添加到頁面
+      $('body').append(notification);
+      
+      // 顯示通知
+      const toast = new bootstrap.Toast(notification.find('.toast'), {
+        autohide: true,
+        delay: 5000
+      });
+      toast.show();
+      
+      // 標記已顯示通知
+      localStorage.setItem('localStorageNotificationShown', 'true');
+    }
+
+    // 清除 localStorage 中的表單數據
+    function clearLocalStorageData() {
+      try {
+        localStorage.removeItem('estimateFormData');
+        showToast('清除成功', '本地儲存的表單數據已清除', 'success');
+        setTimeout(() => {
+          location.reload();
+        }, 1500);
+      } catch (error) {
+        console.error('清除本地儲存的表單數據時出錯:', error);
+        showToast('清除失敗', `清除本地儲存數據時出錯: ${error.message}`, 'error');
+      }
+    }
+
+    // 顯示通用 Toast 提示
+    function showToast(title, message, type = 'info') {
+      // 移除舊的 toast 容器
+      $('.toast-container').remove();
+      
+      // 根據類型設置樣式
+      let bgClass = 'bg-info';
+      if (type === 'success') bgClass = 'bg-success';
+      else if (type === 'warning') bgClass = 'bg-warning';
+      else if (type === 'error') bgClass = 'bg-danger';
+      
+      // 創建通知元素
+      const notification = $(`
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+          <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header ${bgClass} text-white">
+              <strong class="me-auto">${title}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              ${message}
+            </div>
+          </div>
+        </div>
+      `);
+      
+      // 添加到頁面
+      $('body').append(notification);
+      
+      // 顯示通知
+      const toast = new bootstrap.Toast(notification.find('.toast'), {
+        autohide: true,
+        delay: 3000
+      });
+      toast.show();
+    }
+
+    // 主題切換功能
+    function initTheme() {
+      // 檢查本地儲存中是否有主題設置
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+      } else if (savedTheme === 'auto' || !savedTheme) {
+        // 檢查系統偏好
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        if (prefersDarkScheme.matches) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          updateThemeIcon('dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+          updateThemeIcon('light');
+        }
+        
+        // 監聽系統主題變化
+        prefersDarkScheme.addEventListener('change', (e) => {
+          if (localStorage.getItem('theme') === 'auto' || !localStorage.getItem('theme')) {
+            const newTheme = e.matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            updateThemeIcon(newTheme);
+          }
+        });
+        
+        if (!savedTheme) {
+          localStorage.setItem('theme', 'auto');
+        }
+      }
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+      
+      // 顯示主題切換提示
+      const themeName = newTheme === 'light' ? '淺色' : '深色';
+      showToast('主題已切換', `已切換至${themeName}主題`, 'info');
+    }
+    
+    function setTheme(theme) {
+      if (theme === 'auto') {
+        localStorage.setItem('theme', 'auto');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const systemTheme = prefersDarkScheme.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', systemTheme);
+        updateThemeIcon(systemTheme);
+        showToast('主題已設置', '已設置為跟隨系統主題', 'info');
+      } else {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        updateThemeIcon(theme);
+        const themeName = theme === 'light' ? '淺色' : '深色';
+        showToast('主題已設置', `已設置為${themeName}主題`, 'info');
+      }
+      
+      // 關閉模態框
+      $('#localStorageModal').modal('hide');
+    }
+
+    function updateThemeIcon(theme) {
+      const lightIcon = document.getElementById('lightIcon');
+      const darkIcon = document.getElementById('darkIcon');
+      
+      if (theme === 'dark') {
+        lightIcon.style.display = 'none';
+        darkIcon.style.display = 'inline-block';
+      } else {
+        lightIcon.style.display = 'inline-block';
+        darkIcon.style.display = 'none';
+      }
+    }
+
     $(document).ready(function() {
       // 初始化設定
       setDefaultDates();
       $("#quoteNumber").val(generateQuoteNumber());
+      
+      // 初始化主題
+      initTheme();
+      
+      // 主題切換按鈕事件
+      $("#themeToggle").click(toggleTheme);
+      
+      // 初始化 tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
       
       // 按鈕事件綁定
       $("#addBakeryButton").click(() => addItem('bakery'));
@@ -871,9 +1623,29 @@
       
       // 事件監聽
       $(document)
-        .on("input", "input[name$='_quantity'], input[name$='_price'], #taxPercent", updateTotals)
+        .on("input", "input[name$='_quantity'], input[name$='_price'], #taxPercent", function() {
+          updateTotals();
+          // 添加防抖動自動保存
+          clearTimeout(window.autoSaveTimeout);
+          window.autoSaveTimeout = setTimeout(function() {
+            saveFormDataToLocalStorage();
+          }, 1000); // 1秒後自動保存
+        })
         .on("blur", "input[name$='_quantity']", handleBlurSetOne)
         .on("blur", "input[name$='_price']", handleBlurSetZero);
+      
+      // 監聽所有表單輸入變更，自動保存
+      $("input, select, textarea").on("change", function() {
+        clearTimeout(window.autoSaveTimeout);
+        window.autoSaveTimeout = setTimeout(function() {
+          saveFormDataToLocalStorage();
+        }, 1000); // 1秒後自動保存
+      });
+      
+      // 當匯出模態框打開時，自動更新 JSON 數據
+      $('#exportModal').on('show.bs.modal', function() {
+        exportFormData();
+      });
       
       // 外送相關
       $("#deliveryDate").on("change", function() {
@@ -890,6 +1662,9 @@
           return false;
         }
         
+        // 保存表單數據到 localStorage
+        saveFormDataToLocalStorage();
+        
         if ($("input[name='item_quantity']").length > 20) {
           $("<input>").attr({
             type: "hidden",
@@ -903,8 +1678,13 @@
       adjustUIForScreenSize();
       $(window).resize(adjustUIForScreenSize);
       
-      // 預設添加項目
-      if ($("#itemsTable tbody tr").length === 0) addItem('bakery');
+      // 嘗試從 localStorage 加載數據
+      loadFormDataFromLocalStorage();
+      
+      // 如果沒有保存的數據，也顯示通知
+      if (!localStorage.getItem('estimateFormData') && !localStorage.getItem('localStorageNotificationShown')) {
+        setTimeout(showLocalStorageNotification, 2000);
+      }
     });
     </script>
   </body>
