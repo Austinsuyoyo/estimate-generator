@@ -65,7 +65,7 @@ async function processFormData(formData) {
 		{ key: "customerPhone", defaultValue: "" }, { key: "customerFax", defaultValue: "" },
 		{ key: "customerTaxId", defaultValue: "" }, { key: "contactName", defaultValue: "" },
 		{ key: "contactPhone", defaultValue: "" }, { key: "contactGender", defaultValue: "先生" },
-		{ key: "contactAddresss", defaultValue: "" }, { key: "orderType", defaultValue: "" },
+		{ key: "contactAddress", defaultValue: "" }, { key: "orderType", defaultValue: "" },
 		{ key: "quoteNumber", defaultValue: "" }, { key: "quoteDate", defaultValue: "" },
 		{ key: "deadline", defaultValue: "" }, { key: "deliveryDate", defaultValue: "" },
 		{ key: "deliveryDay", defaultValue: "" }, { key: "deliveryTime", defaultValue: "" },
@@ -83,9 +83,8 @@ async function processFormData(formData) {
 	let logoBase64 = "";
 	try {
 		logoBase64 = await convertImageToBase64(data.providerLogo);
-	} catch (error) {
-		console.error("Error converting logo to Base64:", error);
-		logoBase64 = data.providerLogo !== DEFAULT_LOGO_URL 
+	} catch {
+		logoBase64 = data.providerLogo !== DEFAULT_LOGO_URL
 			? await convertImageToBase64(DEFAULT_LOGO_URL).catch(() => data.providerLogo)
 			: data.providerLogo;
 	}
@@ -155,7 +154,7 @@ function processRemarks(remarks, data) {
 		.replace(/{{deliveryDate}}/g, data.deliveryDate)
 		.replace(/{{deliveryDay}}/g, data.deliveryDay)
 		.replace(/{{deliveryTime}}/g, data.deliveryTime)
-		.replace(/{{contactAddresss}}/g, data.contactAddresss)
+		.replace(/{{contactAddress}}/g, data.contactAddress)
 		.replace(/{{deliveryStoreName}}/g, data.deliveryStoreName);
 }
 
